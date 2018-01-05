@@ -20,7 +20,10 @@
       
     </div>
     <div class='code'>
-      <div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pytest</span></pre></div>
+      <div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pytest</span>
+
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+<span class="kn">from</span> <span class="nn">sqlitent</span> <span class="kn">import</span> <span class="n">sqlitent</span><span class="p">,</span> <span class="n">fuzzy</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div>
@@ -29,12 +32,671 @@
       <div class='octowrap'>
         <a class='octothorpe' href='#section-1'>#</a>
       </div>
-      <p>This is to make sure that pytest actually collects these tests
-while we don't yet have actual test code here.</p>
+      <h1>Testing the functionality documented in README.rst</h1>
+<h2>Setup</h2>
     </div>
     <div class='code'>
-      <div class="highlight"><pre><span class="k">def</span> <span class="nf">test_pytest</span><span class="p">():</span>
-    <span class="k">assert</span> <span class="bp">True</span>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-2'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-2'>#</a>
+      </div>
+      <blockquote>
+<blockquote>
+<blockquote>
+<p>db = sqlitent('database.sqlite', autocommit=True)</p>
+<p>Point = namedtuple('Point', ['x', 'y'])
+p1 = Point(11, y=22)
+p1
+Point(x=11, y=22)
+p2 = p._replace(x=33)
+Point(x=33, y=22)
+Car = namedtuple('Car', [
+...     'brand',
+...     'model',
+...     'configuration',
+...     'hp',
+... ])</p>
+</blockquote>
+</blockquote>
+</blockquote>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">Point</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;Point&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">])</span>
+<span class="n">Car</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;Car&#39;</span><span class="p">,</span> <span class="p">[</span>
+    <span class="s1">&#39;brand&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;model&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;configuration&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;hp&#39;</span><span class="p">,</span>
+<span class="p">])</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-3'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-3'>#</a>
+      </div>
+      <h2>Fixtures</h2>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-4'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-4'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="nd">@pytest.fixture</span>
+<span class="k">def</span> <span class="nf">db</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">sqlitent</span><span class="p">(</span><span class="s1">&#39;:memory:&#39;</span><span class="p">,</span> <span class="n">_types</span><span class="o">=</span><span class="p">[</span><span class="n">Point</span><span class="p">,</span> <span class="n">Car</span><span class="p">])</span>
+
+
+<span class="nd">@pytest.fixture</span>
+<span class="k">def</span> <span class="nf">p1</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">Point</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">22</span><span class="p">)</span>
+
+
+<span class="nd">@pytest.fixture</span>
+<span class="k">def</span> <span class="nf">p2</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">Point</span><span class="p">(</span><span class="mi">33</span><span class="p">,</span> <span class="mi">22</span><span class="p">)</span>
+
+
+<span class="nd">@pytest.fixture</span>
+<span class="k">def</span> <span class="nf">c1</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">Car</span><span class="p">(</span><span class="s1">&#39;Audi&#39;</span><span class="p">,</span> <span class="s1">&#39;A1&#39;</span><span class="p">,</span> <span class="s1">&#39;Sport 1.8 TFSI S tronic&#39;</span><span class="p">,</span> <span class="mi">192</span><span class="p">)</span>
+
+
+<span class="nd">@pytest.fixture</span>
+<span class="k">def</span> <span class="nf">c2</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">Car</span><span class="p">(</span><span class="s1">&#39;Audi&#39;</span><span class="p">,</span> <span class="s1">&#39;A1&#39;</span><span class="p">,</span> <span class="s1">&#39;1.6 TDI S tronic&#39;</span><span class="p">,</span> <span class="mi">116</span><span class="p">)</span>
+
+
+<span class="nd">@pytest.fixture</span>
+<span class="k">def</span> <span class="nf">populated_db</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">):</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">db</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-5'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-5'>#</a>
+      </div>
+      <h2>Adding Namedtuples</h2>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>db.add(p1)
+db.insert(p1, p2)
+db.insert([p1], [[p1], p2])
+db.insert(c)
+db.insert([c, p1])  # tuples may be of different types</p>
+</blockquote>
+</blockquote>
+</blockquote>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-6'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-6'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">test_add</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-7'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-7'>#</a>
+      </div>
+      <p>this is the intended usage:
+sqlitent.add takes one namedtuple and returns None</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">db</span>
+    <span class="k">assert</span> <span class="n">p2</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">db</span>
+    <span class="k">assert</span> <span class="n">db</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">p1</span><span class="p">)</span> <span class="o">==</span> <span class="bp">None</span>
+    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">in</span> <span class="n">db</span>
+    <span class="k">assert</span> <span class="n">p2</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">db</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+    <span class="k">assert</span> <span class="n">db</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">p2</span><span class="p">)</span> <span class="o">==</span> <span class="bp">None</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">in</span> <span class="n">db</span>
+    <span class="k">assert</span> <span class="n">p2</span> <span class="ow">in</span> <span class="n">db</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-8'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-8'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">test_add_idempotent</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">p1</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-9'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-9'>#</a>
+      </div>
+      <p>sqlitent.add is idempotent</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">db</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="n">db</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">p1</span><span class="p">)</span> <span class="o">==</span> <span class="bp">None</span>
+        <span class="k">assert</span> <span class="n">p1</span> <span class="ow">in</span> <span class="n">db</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-10'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-10'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="nd">@pytest.mark.parametrize</span><span class="p">(</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="nb">object</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">test_add_signature</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">others</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-11'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-11'>#</a>
+      </div>
+      <p>calling with multiple arguments should fail</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">p2</span><span class="p">,</span> <span class="n">p1</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">p2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-12'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-12'>#</a>
+      </div>
+      <p>calling with anything other than a namedtuple should fail</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">for</span> <span class="n">other</span> <span class="ow">in</span> <span class="n">others</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">other</span><span class="p">())</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-13'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-13'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">test_insert_one</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-14'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-14'>#</a>
+      </div>
+      <p>sqlitent.insert can take one namedtuple and returns None</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">db</span>
+    <span class="k">assert</span> <span class="n">p2</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">db</span>
+    <span class="k">assert</span> <span class="n">db</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">p1</span><span class="p">)</span> <span class="o">==</span> <span class="bp">None</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">in</span> <span class="n">db</span>
+    <span class="k">assert</span> <span class="n">p2</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">db</span>
+    <span class="k">assert</span> <span class="n">db</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">p2</span><span class="p">)</span> <span class="o">==</span> <span class="bp">None</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">in</span> <span class="n">db</span>
+    <span class="k">assert</span> <span class="n">p2</span> <span class="ow">in</span> <span class="n">db</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-15'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-15'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">test_insert_many</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-16'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-16'>#</a>
+      </div>
+      <p>sqlitent.insert can take multiple namedtuple and returns None</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">db</span>
+    <span class="k">assert</span> <span class="n">p2</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">db</span>
+    <span class="k">assert</span> <span class="n">db</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">)</span> <span class="o">==</span> <span class="bp">None</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">in</span> <span class="n">db</span>
+    <span class="k">assert</span> <span class="n">p2</span> <span class="ow">in</span> <span class="n">db</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-17'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-17'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">test_insert_list</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-18'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-18'>#</a>
+      </div>
+      <p>sqlitent.insert can take list(s) of namedtuples and returns None</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">db</span>
+    <span class="k">assert</span> <span class="n">p2</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">db</span>
+    <span class="k">assert</span> <span class="n">db</span><span class="o">.</span><span class="n">insert</span><span class="p">([</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">])</span> <span class="o">==</span> <span class="bp">None</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">in</span> <span class="n">db</span>
+    <span class="k">assert</span> <span class="n">p2</span> <span class="ow">in</span> <span class="n">db</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-19'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-19'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">test_insert_mixed</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-20'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-20'>#</a>
+      </div>
+      <p>sqlitent.insert can take lists and single namedtuples of many
+types in any combination and returns None</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">db</span>
+    <span class="k">assert</span> <span class="n">p2</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">db</span>
+    <span class="k">assert</span> <span class="n">c1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">db</span>
+    <span class="k">assert</span> <span class="n">c2</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">db</span>
+    <span class="k">assert</span> <span class="n">db</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">c1</span><span class="p">,</span> <span class="p">[</span><span class="n">p1</span><span class="p">,</span> <span class="p">[</span><span class="n">c2</span><span class="p">]],</span> <span class="n">p2</span><span class="p">,</span> <span class="p">[],</span> <span class="n">p2</span><span class="p">)</span> <span class="o">==</span> <span class="bp">None</span>
+    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">in</span> <span class="n">db</span>
+    <span class="k">assert</span> <span class="n">p2</span> <span class="ow">in</span> <span class="n">db</span>
+    <span class="k">assert</span> <span class="n">c1</span> <span class="ow">in</span> <span class="n">db</span>
+    <span class="k">assert</span> <span class="n">c2</span> <span class="ow">in</span> <span class="n">db</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-21'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-21'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">test_insert_idempotent</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">c1</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-22'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-22'>#</a>
+      </div>
+      <p>sqlitent.insert is idempotent</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">db</span>
+    <span class="k">assert</span> <span class="n">p2</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">db</span>
+    <span class="k">assert</span> <span class="n">c1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">db</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="n">db</span><span class="o">.</span><span class="n">insert</span><span class="p">([</span><span class="n">p1</span><span class="p">],</span> <span class="p">[],</span> <span class="p">[[],</span> <span class="p">[</span><span class="n">p2</span><span class="p">]],</span> <span class="n">c1</span><span class="p">)</span> <span class="o">==</span> <span class="bp">None</span>
+        <span class="k">assert</span> <span class="n">p1</span> <span class="ow">in</span> <span class="n">db</span>
+        <span class="k">assert</span> <span class="n">p2</span> <span class="ow">in</span> <span class="n">db</span>
+        <span class="k">assert</span> <span class="n">c1</span> <span class="ow">in</span> <span class="n">db</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-23'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-23'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="nd">@pytest.mark.parametrize</span><span class="p">(</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="nb">object</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">test_insert_signature</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="n">others</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-24'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-24'>#</a>
+      </div>
+      <p>calling with anything other than a namedtuple should fail</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">for</span> <span class="n">other</span> <span class="ow">in</span> <span class="n">others</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">c1</span><span class="p">,</span> <span class="n">other</span><span class="p">(),</span> <span class="n">p1</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">other</span> <span class="ow">in</span> <span class="n">others</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">insert</span><span class="p">([</span><span class="n">p1</span><span class="p">],</span> <span class="p">[],</span> <span class="p">[[],</span> <span class="p">[</span><span class="n">other</span><span class="p">()]],</span> <span class="n">c1</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-25'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-25'>#</a>
+      </div>
+      <h1>Removing Namedtuples</h1>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>db.remove(p1)
+db.delete(p1, p2)
+db.delete([p1, p2, p1, p2]
+db.delete(p1, [p2, [], [p1]])</p>
+</blockquote>
+</blockquote>
+</blockquote>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-26'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-26'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">test_remove</span><span class="p">(</span><span class="n">populated_db</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="n">p2</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="n">c1</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="n">c2</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">populated_db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span>
+    <span class="k">assert</span> <span class="n">populated_db</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">p1</span><span class="p">)</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="n">p2</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="n">c1</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="n">c2</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">populated_db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span>
+    <span class="k">assert</span> <span class="n">populated_db</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">p2</span><span class="p">)</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="n">p2</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="n">c1</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="n">c2</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">populated_db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+    <span class="k">assert</span> <span class="n">populated_db</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">c1</span><span class="p">)</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="n">p2</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="n">c1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="n">c2</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">populated_db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+    <span class="k">assert</span> <span class="n">populated_db</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">c2</span><span class="p">)</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="n">p2</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="n">c1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="n">c2</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">populated_db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-27'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-27'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">test_remove_idempotent</span><span class="p">(</span><span class="n">populated_db</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="n">p2</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="n">c1</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="n">c2</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">populated_db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="n">populated_db</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">p1</span><span class="p">)</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">assert</span> <span class="n">populated_db</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">c1</span><span class="p">)</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">assert</span> <span class="n">p1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>
+        <span class="k">assert</span> <span class="n">p2</span> <span class="ow">in</span> <span class="n">populated_db</span>
+        <span class="k">assert</span> <span class="n">c1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>
+        <span class="k">assert</span> <span class="n">c2</span> <span class="ow">in</span> <span class="n">populated_db</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">populated_db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-28'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-28'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="nd">@pytest.mark.parametrize</span><span class="p">(</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="nb">object</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">test_remove_signature</span><span class="p">(</span><span class="n">populated_db</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="n">others</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-29'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-29'>#</a>
+      </div>
+      <p>calling with multiple arguments should fail</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+        <span class="n">populated_db</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">c1</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+        <span class="n">populated_db</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">c1</span><span class="p">,</span> <span class="n">p1</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+        <span class="n">populated_db</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-30'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-30'>#</a>
+      </div>
+      <p>calling with anything other than a namedtuple should fail</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">for</span> <span class="n">other</span> <span class="ow">in</span> <span class="n">others</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+            <span class="n">populated_db</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">other</span><span class="p">())</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-31'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-31'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">test_delete_one</span><span class="p">(</span><span class="n">populated_db</span><span class="p">,</span> <span class="n">p1</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">populated_db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span>
+    <span class="k">assert</span> <span class="n">populated_db</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">p1</span><span class="p">)</span> <span class="o">==</span> <span class="bp">None</span>
+    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">populated_db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-32'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-32'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">test_delete_many</span><span class="p">(</span><span class="n">populated_db</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="n">p2</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="n">c1</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="n">c2</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">populated_db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span>
+    <span class="k">assert</span> <span class="n">populated_db</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">)</span> <span class="o">==</span> <span class="bp">None</span>
+    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="n">p2</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="n">c1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="n">c2</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">populated_db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-33'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-33'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">test_delete_list</span><span class="p">(</span><span class="n">populated_db</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="n">p2</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="n">c1</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="n">c2</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">populated_db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span>
+    <span class="k">assert</span> <span class="n">populated_db</span><span class="o">.</span><span class="n">delete</span><span class="p">([</span><span class="n">p1</span><span class="p">],</span> <span class="p">[</span><span class="n">p2</span><span class="p">,</span> <span class="n">c1</span><span class="p">],</span> <span class="p">[</span><span class="n">c2</span><span class="p">])</span> <span class="o">==</span> <span class="bp">None</span>
+    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="n">p2</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="n">c1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="n">c2</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">populated_db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-34'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-34'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">test_delete_mixed</span><span class="p">(</span><span class="n">populated_db</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="n">p2</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="n">c1</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="n">c2</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">populated_db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span>
+    <span class="k">assert</span> <span class="n">populated_db</span><span class="o">.</span><span class="n">delete</span><span class="p">([[</span><span class="n">p1</span><span class="p">],</span> <span class="p">[[],</span> <span class="p">[[</span><span class="n">c1</span><span class="p">]]]],</span> <span class="n">c2</span><span class="p">,</span> <span class="p">[],</span> <span class="n">p2</span><span class="p">)</span> <span class="o">==</span> <span class="bp">None</span>
+    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="n">p2</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="n">c1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="n">c2</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">populated_db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-35'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-35'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="nd">@pytest.mark.parametrize</span><span class="p">(</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="nb">object</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">test_delete_signature</span><span class="p">(</span><span class="n">populated_db</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">,</span> <span class="n">others</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-36'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-36'>#</a>
+      </div>
+      <p>calling with anything other than a namedtuple should fail</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">for</span> <span class="n">other</span> <span class="ow">in</span> <span class="n">others</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+            <span class="n">populated_db</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="p">[</span><span class="n">p2</span><span class="p">,</span> <span class="p">[</span><span class="n">c2</span><span class="p">]],</span> <span class="p">[</span><span class="n">c1</span><span class="p">,</span> <span class="n">other</span><span class="p">()],</span> <span class="n">p1</span><span class="p">)</span>
 
 </pre></div>
     </div>
