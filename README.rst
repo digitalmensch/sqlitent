@@ -5,7 +5,7 @@ sqlitent - namedtuples inside sqlite databases
 
 sqlitent provides a set-like interface on top of SQLite_. Values can
 be None, int, float, str, and bytes. Tuple types are distinguished by
-name (case sensitive!) and number of fields.
+name (case sensitive!) and number of fields. Documentation_.
 
 sqlitent was inspired by sqlitedict_ and kv_.
 
@@ -113,6 +113,7 @@ There is a locking facility that uses SQLite's transaction API:
 The code is MIT licensed.
 
 .. _Sqlite: https://sqlite.org/
+.. _Documentation: https://digitalmensch.github.io/sqlitent/
 .. _sqlitedict: https://github.com/RaRe-Technologies/sqlitedict
 .. _kv: https://github.com/mgax/kv
 .. _code: https://github.com/digitalmensch/sqlitent

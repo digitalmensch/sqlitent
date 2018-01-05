@@ -7,7 +7,7 @@ with open(os.path.join(os.path.dirname(__file__), 'README.rst')) as f:
 setup(
     name='sqlitent',
     url='https://github.com/digitalmensch/sqlitent',
-    download_url='http://pypi.python.org/pypi/sqlitedict',
+    download_url='https://pypi.python.org/pypi/sqlitent',
     description='namedtuples inside set-like sqlite databases',
     long_description=readme_rst,
     keywords='sqlite, persistent set, namedtuple',
