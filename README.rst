@@ -1,6 +1,8 @@
 sqlitent - namedtuples inside sqlite databases
 ==============================================
 
+**THIS PROJECT IS CURRENTLY A STUB WITHOUT CODE**
+
 sqlitent provides a set-like interface on top of SQLite_. Values can
 be None, int, float, str, and bytes. Tuple types are distinguished by
 name (case sensitive!) and number of fields.
