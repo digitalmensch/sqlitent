@@ -20,10 +20,7 @@
       
     </div>
     <div class='code'>
-      <div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pytest</span>
-
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
-<span class="kn">from</span> <span class="nn">sqlitent</span> <span class="kn">import</span> <span class="n">sqlitent</span><span class="p">,</span> <span class="n">fuzzy</span></pre></div>
+      <div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pytest</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div>
@@ -33,10 +30,10 @@
         <a class='octothorpe' href='#section-1'>#</a>
       </div>
       <h1>Testing the functionality documented in README.rst</h1>
-<h2>Setup</h2>
     </div>
     <div class='code'>
-      <div class="highlight"><pre></pre></div>
+      <div class="highlight"><pre><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+<span class="kn">from</span> <span class="nn">sqlitent</span> <span class="kn">import</span> <span class="n">sqlitent</span><span class="p">,</span> <span class="n">fuzzy</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div>
@@ -45,25 +42,7 @@
       <div class='octowrap'>
         <a class='octothorpe' href='#section-2'>#</a>
       </div>
-      <blockquote>
-<blockquote>
-<blockquote>
-<p>db = sqlitent('database.sqlite', autocommit=True)</p>
-<p>Point = namedtuple('Point', ['x', 'y'])
-p1 = Point(11, y=22)
-p1
-Point(x=11, y=22)
-p2 = p._replace(x=33)
-Point(x=33, y=22)
-Car = namedtuple('Car', [
-...     'brand',
-...     'model',
-...     'configuration',
-...     'hp',
-... ])</p>
-</blockquote>
-</blockquote>
-</blockquote>
+      <h2>Setup</h2>
     </div>
     <div class='code'>
       <div class="highlight"><pre><span class="n">Point</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;Point&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">])</span>
@@ -134,17 +113,6 @@ Car = namedtuple('Car', [
         <a class='octothorpe' href='#section-5'>#</a>
       </div>
       <h2>Adding Namedtuples</h2>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>db.add(p1)
-db.insert(p1, p2)
-db.insert([p1], [[p1], p2])
-db.insert(c)
-db.insert([c, p1])  # tuples may be of different types</p>
-</blockquote>
-</blockquote>
-</blockquote>
     </div>
     <div class='code'>
       <div class="highlight"><pre></pre></div>
@@ -458,17 +426,7 @@ types in any combination and returns None</p>
       <div class='octowrap'>
         <a class='octothorpe' href='#section-25'>#</a>
       </div>
-      <h1>Removing Namedtuples</h1>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>db.remove(p1)
-db.delete(p1, p2)
-db.delete([p1, p2, p1, p2]
-db.delete(p1, [p2, [], [p1]])</p>
-</blockquote>
-</blockquote>
-</blockquote>
+      <h2>Removing Namedtuples</h2>
     </div>
     <div class='code'>
       <div class="highlight"><pre></pre></div>
@@ -483,8 +441,19 @@ db.delete(p1, [p2, [], [p1]])</p>
       
     </div>
     <div class='code'>
-      <div class="highlight"><pre><span class="k">def</span> <span class="nf">test_remove</span><span class="p">(</span><span class="n">populated_db</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">):</span>
-    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">in</span> <span class="n">populated_db</span>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">test_remove</span><span class="p">(</span><span class="n">populated_db</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-27'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-27'>#</a>
+      </div>
+      <p>remove takes namedtuples out of the database</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">in</span> <span class="n">populated_db</span>
     <span class="k">assert</span> <span class="n">p2</span> <span class="ow">in</span> <span class="n">populated_db</span>
     <span class="k">assert</span> <span class="n">c1</span> <span class="ow">in</span> <span class="n">populated_db</span>
     <span class="k">assert</span> <span class="n">c2</span> <span class="ow">in</span> <span class="n">populated_db</span>
@@ -516,16 +485,27 @@ db.delete(p1, [p2, [], [p1]])</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-27'>
+  <div class='section' id='section-28'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-27'>#</a>
+        <a class='octothorpe' href='#section-28'>#</a>
       </div>
       
     </div>
     <div class='code'>
-      <div class="highlight"><pre><span class="k">def</span> <span class="nf">test_remove_idempotent</span><span class="p">(</span><span class="n">populated_db</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">):</span>
-    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">in</span> <span class="n">populated_db</span>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">test_remove_idempotent</span><span class="p">(</span><span class="n">populated_db</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-29'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-29'>#</a>
+      </div>
+      <p>remove is idempotent</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">in</span> <span class="n">populated_db</span>
     <span class="k">assert</span> <span class="n">p2</span> <span class="ow">in</span> <span class="n">populated_db</span>
     <span class="k">assert</span> <span class="n">c1</span> <span class="ow">in</span> <span class="n">populated_db</span>
     <span class="k">assert</span> <span class="n">c2</span> <span class="ow">in</span> <span class="n">populated_db</span>
@@ -541,10 +521,10 @@ db.delete(p1, [p2, [], [p1]])</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-28'>
+  <div class='section' id='section-30'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-28'>#</a>
+        <a class='octothorpe' href='#section-30'>#</a>
       </div>
       
     </div>
@@ -554,10 +534,10 @@ db.delete(p1, [p2, [], [p1]])</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-29'>
+  <div class='section' id='section-31'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-29'>#</a>
+        <a class='octothorpe' href='#section-31'>#</a>
       </div>
       <p>calling with multiple arguments should fail</p>
     </div>
@@ -573,10 +553,10 @@ db.delete(p1, [p2, [], [p1]])</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-30'>
+  <div class='section' id='section-32'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-30'>#</a>
+        <a class='octothorpe' href='#section-32'>#</a>
       </div>
       <p>calling with anything other than a namedtuple should fail</p>
     </div>
@@ -587,16 +567,27 @@ db.delete(p1, [p2, [], [p1]])</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-31'>
+  <div class='section' id='section-33'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-31'>#</a>
+        <a class='octothorpe' href='#section-33'>#</a>
       </div>
       
     </div>
     <div class='code'>
-      <div class="highlight"><pre><span class="k">def</span> <span class="nf">test_delete_one</span><span class="p">(</span><span class="n">populated_db</span><span class="p">,</span> <span class="n">p1</span><span class="p">):</span>
-    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">in</span> <span class="n">populated_db</span>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">test_delete_one</span><span class="p">(</span><span class="n">populated_db</span><span class="p">,</span> <span class="n">p1</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-34'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-34'>#</a>
+      </div>
+      <p>delete may be called with a single namedtuple</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">in</span> <span class="n">populated_db</span>
     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">populated_db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span>
     <span class="k">assert</span> <span class="n">populated_db</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">p1</span><span class="p">)</span> <span class="o">==</span> <span class="bp">None</span>
     <span class="k">assert</span> <span class="n">p1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>
@@ -604,16 +595,27 @@ db.delete(p1, [p2, [], [p1]])</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-32'>
+  <div class='section' id='section-35'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-32'>#</a>
+        <a class='octothorpe' href='#section-35'>#</a>
       </div>
       
     </div>
     <div class='code'>
-      <div class="highlight"><pre><span class="k">def</span> <span class="nf">test_delete_many</span><span class="p">(</span><span class="n">populated_db</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">):</span>
-    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">in</span> <span class="n">populated_db</span>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">test_delete_many</span><span class="p">(</span><span class="n">populated_db</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-36'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-36'>#</a>
+      </div>
+      <p>delete may be called with a variable number of namedtuples</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">in</span> <span class="n">populated_db</span>
     <span class="k">assert</span> <span class="n">p2</span> <span class="ow">in</span> <span class="n">populated_db</span>
     <span class="k">assert</span> <span class="n">c1</span> <span class="ow">in</span> <span class="n">populated_db</span>
     <span class="k">assert</span> <span class="n">c2</span> <span class="ow">in</span> <span class="n">populated_db</span>
@@ -627,16 +629,27 @@ db.delete(p1, [p2, [], [p1]])</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-33'>
+  <div class='section' id='section-37'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-33'>#</a>
+        <a class='octothorpe' href='#section-37'>#</a>
       </div>
       
     </div>
     <div class='code'>
-      <div class="highlight"><pre><span class="k">def</span> <span class="nf">test_delete_list</span><span class="p">(</span><span class="n">populated_db</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">):</span>
-    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">in</span> <span class="n">populated_db</span>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">test_delete_list</span><span class="p">(</span><span class="n">populated_db</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-38'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-38'>#</a>
+      </div>
+      <p>delete may be called with lists of namedtuples</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">in</span> <span class="n">populated_db</span>
     <span class="k">assert</span> <span class="n">p2</span> <span class="ow">in</span> <span class="n">populated_db</span>
     <span class="k">assert</span> <span class="n">c1</span> <span class="ow">in</span> <span class="n">populated_db</span>
     <span class="k">assert</span> <span class="n">c2</span> <span class="ow">in</span> <span class="n">populated_db</span>
@@ -650,16 +663,28 @@ db.delete(p1, [p2, [], [p1]])</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-34'>
+  <div class='section' id='section-39'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-34'>#</a>
+        <a class='octothorpe' href='#section-39'>#</a>
       </div>
       
     </div>
     <div class='code'>
-      <div class="highlight"><pre><span class="k">def</span> <span class="nf">test_delete_mixed</span><span class="p">(</span><span class="n">populated_db</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">):</span>
-    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">in</span> <span class="n">populated_db</span>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">test_delete_mixed</span><span class="p">(</span><span class="n">populated_db</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-40'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-40'>#</a>
+      </div>
+      <p>delete may be called with a mix of single namedtuples
+and lists of namedtuples</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">in</span> <span class="n">populated_db</span>
     <span class="k">assert</span> <span class="n">p2</span> <span class="ow">in</span> <span class="n">populated_db</span>
     <span class="k">assert</span> <span class="n">c1</span> <span class="ow">in</span> <span class="n">populated_db</span>
     <span class="k">assert</span> <span class="n">c2</span> <span class="ow">in</span> <span class="n">populated_db</span>
@@ -673,10 +698,45 @@ db.delete(p1, [p2, [], [p1]])</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-35'>
+  <div class='section' id='section-41'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-35'>#</a>
+        <a class='octothorpe' href='#section-41'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">test_delete_idempotent</span><span class="p">(</span><span class="n">populated_db</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-42'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-42'>#</a>
+      </div>
+      <p>delete is idempotent</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="n">p2</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="n">c1</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="n">c2</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">populated_db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="n">populated_db</span><span class="o">.</span><span class="n">delete</span><span class="p">([[</span><span class="n">p1</span><span class="p">],</span> <span class="p">[[],</span> <span class="p">[[</span><span class="n">c1</span><span class="p">]]]],</span> <span class="n">c2</span><span class="p">,</span> <span class="p">[],</span> <span class="n">p2</span><span class="p">)</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">assert</span> <span class="n">p1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>
+        <span class="k">assert</span> <span class="n">p2</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>
+        <span class="k">assert</span> <span class="n">c1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>
+        <span class="k">assert</span> <span class="n">c2</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">populated_db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-43'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-43'>#</a>
       </div>
       
     </div>
@@ -686,12 +746,12 @@ db.delete(p1, [p2, [], [p1]])</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-36'>
+  <div class='section' id='section-44'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-36'>#</a>
+        <a class='octothorpe' href='#section-44'>#</a>
       </div>
-      <p>calling with anything other than a namedtuple should fail</p>
+      <p>calling delete with anything other than a namedtuple should fail</p>
     </div>
     <div class='code'>
       <div class="highlight"><pre>    <span class="k">for</span> <span class="n">other</span> <span class="ow">in</span> <span class="n">others</span><span class="p">:</span>

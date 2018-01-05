@@ -1,26 +1,15 @@
 import pytest
 
+
+# # Testing the functionality documented in README.rst
+
+
 from collections import namedtuple
 from sqlitent import sqlitent, fuzzy
 
-# # Testing the functionality documented in README.rst
-#
+
 # ## Setup
 
-# >>> db = sqlitent('database.sqlite', autocommit=True)
-# >>>
-# >>> Point = namedtuple('Point', ['x', 'y'])
-# >>> p1 = Point(11, y=22)
-# >>> p1
-# Point(x=11, y=22)
-# >>> p2 = p._replace(x=33)
-# Point(x=33, y=22)
-# >>> Car = namedtuple('Car', [
-# ...     'brand',
-# ...     'model',
-# ...     'configuration',
-# ...     'hp',
-# ... ])
 
 Point = namedtuple('Point', ['x', 'y'])
 Car = namedtuple('Car', [
@@ -66,12 +55,6 @@ def populated_db(db, p1, p2, c1, c2):
 
 
 # ## Adding Namedtuples
-#
-# >>> db.add(p1)
-# >>> db.insert(p1, p2)
-# >>> db.insert([p1], [[p1], p2])
-# >>> db.insert(c)
-# >>> db.insert([c, p1])  # tuples may be of different types
 
 
 def test_add(db, p1, p2):
@@ -197,15 +180,11 @@ def test_insert_signature(db, p1, c1, others):
             db.insert([p1], [], [[], [other()]], c1)
 
 
-# # Removing Namedtuples
-#
-# >>> db.remove(p1)
-# >>> db.delete(p1, p2)
-# >>> db.delete([p1, p2, p1, p2]
-# >>> db.delete(p1, [p2, [], [p1]])
+# ## Removing Namedtuples
 
 
 def test_remove(populated_db, p1, p2, c1, c2):
+    # remove takes namedtuples out of the database
     assert p1 in populated_db
     assert p2 in populated_db
     assert c1 in populated_db
@@ -238,6 +217,7 @@ def test_remove(populated_db, p1, p2, c1, c2):
 
 
 def test_remove_idempotent(populated_db, p1, p2, c1, c2):
+    # remove is idempotent
     assert p1 in populated_db
     assert p2 in populated_db
     assert c1 in populated_db
@@ -255,7 +235,6 @@ def test_remove_idempotent(populated_db, p1, p2, c1, c2):
 
 @pytest.mark.parametrize("other", [int, float, str, bytes, list, dict, object, tuple])
 def test_remove_signature(populated_db, p1, c1, others):
-
     # calling with multiple arguments should fail
     with pytest.raises(Exception):
         populated_db.remove(p1, c1)
@@ -273,6 +252,7 @@ def test_remove_signature(populated_db, p1, c1, others):
 
 
 def test_delete_one(populated_db, p1):
+    # delete may be called with a single namedtuple
     assert p1 in populated_db
     assert len(populated_db) == 4
     assert populated_db.delete(p1) == None
@@ -281,6 +261,7 @@ def test_delete_one(populated_db, p1):
 
 
 def test_delete_many(populated_db, p1, p2, c1, c2):
+    # delete may be called with a variable number of namedtuples
     assert p1 in populated_db
     assert p2 in populated_db
     assert c1 in populated_db
@@ -295,6 +276,7 @@ def test_delete_many(populated_db, p1, p2, c1, c2):
 
 
 def test_delete_list(populated_db, p1, p2, c1, c2):
+    # delete may be called with lists of namedtuples
     assert p1 in populated_db
     assert p2 in populated_db
     assert c1 in populated_db
@@ -309,6 +291,8 @@ def test_delete_list(populated_db, p1, p2, c1, c2):
 
 
 def test_delete_mixed(populated_db, p1, p2, c1, c2):
+    # delete may be called with a mix of single namedtuples
+    # and lists of namedtuples
     assert p1 in populated_db
     assert p2 in populated_db
     assert c1 in populated_db
@@ -322,9 +306,25 @@ def test_delete_mixed(populated_db, p1, p2, c1, c2):
     assert len(populated_db) == 0
 
 
+def test_delete_idempotent(populated_db, p1, p2, c1, c2):
+    # delete is idempotent
+    assert p1 in populated_db
+    assert p2 in populated_db
+    assert c1 in populated_db
+    assert c2 in populated_db
+    assert len(populated_db) == 4
+    for _ in range(10):
+        assert populated_db.delete([[p1], [[], [[c1]]]], c2, [], p2) = None
+        assert p1 not in populated_db
+        assert p2 not in populated_db
+        assert c1 not in populated_db
+        assert c2 not in populated_db
+        assert len(populated_db) == 0
+
+
 @pytest.mark.parametrize("other", [int, float, str, bytes, list, dict, object, tuple])
 def test_delete_signature(populated_db, p1, p2, c1, c2, others):
-    # calling with anything other than a namedtuple should fail
+    # calling delete with anything other than a namedtuple should fail
     for other in others:
         with pytest.raises(Exception):
             populated_db.delete(p1, [p2, [c2]], [c1, other()], p1)
