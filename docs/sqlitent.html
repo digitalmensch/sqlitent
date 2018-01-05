@@ -295,9 +295,7 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">yield</span> <span class="n">it</span>
         <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">_flatten</span><span class="p">(</span><span class="n">it</span><span class="p">):</span>
-            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;__to_ntlist&#39;</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__isnamedtuple</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__isnamedtuple</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
-                <span class="k">print</span><span class="p">(</span><span class="s1">&#39;raising...&#39;</span><span class="p">)</span>
                 <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;expected namedtuple, instead got {type(value)}: {value}&#39;</span><span class="p">)</span>
             <span class="k">yield</span> <span class="n">value</span></pre></div>
     </div>
@@ -330,7 +328,6 @@
     </div>
     <div class='code'>
       <div class="highlight"><pre>    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__select_cache</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
         <span class="k">return</span> <span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span>
             <span class="nb">map</span><span class="p">(</span><span class="n">nt_type</span><span class="o">.</span><span class="n">_make</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__execute</span><span class="p">(</span><span class="n">stmt</span><span class="p">))</span>
             <span class="k">for</span> <span class="n">nt_type</span><span class="p">,</span> <span class="n">stmt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__select_cache</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>

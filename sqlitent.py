@@ -88,9 +88,7 @@ class sqlitent(collections.abc.Collection):
             else:
                 yield it
         for value in _flatten(it):
-            print('__to_ntlist', value, self.__isnamedtuple(value))
             if not self.__isnamedtuple(value):
-                print('raising...')
                 raise Exception(f'expected namedtuple, instead got {type(value)}: {value}')
             yield value
 
@@ -103,7 +101,6 @@ class sqlitent(collections.abc.Collection):
         return bool(list(self.__execute(self.__single_cache[_type], nt)))
 
     def __iter__(self):
-        print(self.__select_cache.items())
         return itertools.chain.from_iterable(
             map(nt_type._make, self.__execute(stmt))
             for nt_type, stmt in self.__select_cache.items()
