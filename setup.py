@@ -25,4 +25,6 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Topic :: Database :: Front-Ends',
     ],
+    setup_requires=['pytest-runner'],
+    tests_require=['pytest'],
 )
