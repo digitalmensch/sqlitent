@@ -458,25 +458,25 @@ types in any combination and returns None</p>
     <span class="k">assert</span> <span class="n">c1</span> <span class="ow">in</span> <span class="n">populated_db</span>
     <span class="k">assert</span> <span class="n">c2</span> <span class="ow">in</span> <span class="n">populated_db</span>
     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">populated_db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span>
-    <span class="k">assert</span> <span class="n">populated_db</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">p1</span><span class="p">)</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="k">assert</span> <span class="n">populated_db</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">p1</span><span class="p">)</span> <span class="o">==</span> <span class="bp">None</span>
     <span class="k">assert</span> <span class="n">p1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>
     <span class="k">assert</span> <span class="n">p2</span> <span class="ow">in</span> <span class="n">populated_db</span>
     <span class="k">assert</span> <span class="n">c1</span> <span class="ow">in</span> <span class="n">populated_db</span>
     <span class="k">assert</span> <span class="n">c2</span> <span class="ow">in</span> <span class="n">populated_db</span>
     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">populated_db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span>
-    <span class="k">assert</span> <span class="n">populated_db</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">p2</span><span class="p">)</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="k">assert</span> <span class="n">populated_db</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">p2</span><span class="p">)</span> <span class="o">==</span> <span class="bp">None</span>
     <span class="k">assert</span> <span class="n">p1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>
     <span class="k">assert</span> <span class="n">p2</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>
     <span class="k">assert</span> <span class="n">c1</span> <span class="ow">in</span> <span class="n">populated_db</span>
     <span class="k">assert</span> <span class="n">c2</span> <span class="ow">in</span> <span class="n">populated_db</span>
     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">populated_db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
-    <span class="k">assert</span> <span class="n">populated_db</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">c1</span><span class="p">)</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="k">assert</span> <span class="n">populated_db</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">c1</span><span class="p">)</span> <span class="o">==</span> <span class="bp">None</span>
     <span class="k">assert</span> <span class="n">p1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>
     <span class="k">assert</span> <span class="n">p2</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>
     <span class="k">assert</span> <span class="n">c1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>
     <span class="k">assert</span> <span class="n">c2</span> <span class="ow">in</span> <span class="n">populated_db</span>
     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">populated_db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
-    <span class="k">assert</span> <span class="n">populated_db</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">c2</span><span class="p">)</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="k">assert</span> <span class="n">populated_db</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">c2</span><span class="p">)</span> <span class="o">==</span> <span class="bp">None</span>
     <span class="k">assert</span> <span class="n">p1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>
     <span class="k">assert</span> <span class="n">p2</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>
     <span class="k">assert</span> <span class="n">c1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>
@@ -511,8 +511,8 @@ types in any combination and returns None</p>
     <span class="k">assert</span> <span class="n">c2</span> <span class="ow">in</span> <span class="n">populated_db</span>
     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">populated_db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span>
     <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
-        <span class="k">assert</span> <span class="n">populated_db</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">p1</span><span class="p">)</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="k">assert</span> <span class="n">populated_db</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">c1</span><span class="p">)</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">assert</span> <span class="n">populated_db</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">p1</span><span class="p">)</span> <span class="o">==</span> <span class="bp">None</span>
+        <span class="k">assert</span> <span class="n">populated_db</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">c1</span><span class="p">)</span> <span class="o">==</span> <span class="bp">None</span>
         <span class="k">assert</span> <span class="n">p1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>
         <span class="k">assert</span> <span class="n">p2</span> <span class="ow">in</span> <span class="n">populated_db</span>
         <span class="k">assert</span> <span class="n">c1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>
@@ -724,7 +724,7 @@ and lists of namedtuples</p>
     <span class="k">assert</span> <span class="n">c2</span> <span class="ow">in</span> <span class="n">populated_db</span>
     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">populated_db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span>
     <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
-        <span class="k">assert</span> <span class="n">populated_db</span><span class="o">.</span><span class="n">delete</span><span class="p">([[</span><span class="n">p1</span><span class="p">],</span> <span class="p">[[],</span> <span class="p">[[</span><span class="n">c1</span><span class="p">]]]],</span> <span class="n">c2</span><span class="p">,</span> <span class="p">[],</span> <span class="n">p2</span><span class="p">)</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">assert</span> <span class="n">populated_db</span><span class="o">.</span><span class="n">delete</span><span class="p">([[</span><span class="n">p1</span><span class="p">],</span> <span class="p">[[],</span> <span class="p">[[</span><span class="n">c1</span><span class="p">]]]],</span> <span class="n">c2</span><span class="p">,</span> <span class="p">[],</span> <span class="n">p2</span><span class="p">)</span> <span class="o">==</span> <span class="bp">None</span>
         <span class="k">assert</span> <span class="n">p1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>
         <span class="k">assert</span> <span class="n">p2</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>
         <span class="k">assert</span> <span class="n">c1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>

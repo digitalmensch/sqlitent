@@ -190,25 +190,25 @@ def test_remove(populated_db, p1, p2, c1, c2):
     assert c1 in populated_db
     assert c2 in populated_db
     assert len(populated_db) == 4
-    assert populated_db.remove(p1) = None
+    assert populated_db.remove(p1) == None
     assert p1 not in populated_db
     assert p2 in populated_db
     assert c1 in populated_db
     assert c2 in populated_db
     assert len(populated_db) == 3
-    assert populated_db.remove(p2) = None
+    assert populated_db.remove(p2) == None
     assert p1 not in populated_db
     assert p2 not in populated_db
     assert c1 in populated_db
     assert c2 in populated_db
     assert len(populated_db) == 2
-    assert populated_db.remove(c1) = None
+    assert populated_db.remove(c1) == None
     assert p1 not in populated_db
     assert p2 not in populated_db
     assert c1 not in populated_db
     assert c2 in populated_db
     assert len(populated_db) == 1
-    assert populated_db.remove(c2) = None
+    assert populated_db.remove(c2) == None
     assert p1 not in populated_db
     assert p2 not in populated_db
     assert c1 not in populated_db
@@ -224,8 +224,8 @@ def test_remove_idempotent(populated_db, p1, p2, c1, c2):
     assert c2 in populated_db
     assert len(populated_db) == 4
     for _ in range(10):
-        assert populated_db.remove(p1) = None
-        assert populated_db.remove(c1) = None
+        assert populated_db.remove(p1) == None
+        assert populated_db.remove(c1) == None
         assert p1 not in populated_db
         assert p2 in populated_db
         assert c1 not in populated_db
@@ -314,7 +314,7 @@ def test_delete_idempotent(populated_db, p1, p2, c1, c2):
     assert c2 in populated_db
     assert len(populated_db) == 4
     for _ in range(10):
-        assert populated_db.delete([[p1], [[], [[c1]]]], c2, [], p2) = None
+        assert populated_db.delete([[p1], [[], [[c1]]]], c2, [], p2) == None
         assert p1 not in populated_db
         assert p2 not in populated_db
         assert c1 not in populated_db
