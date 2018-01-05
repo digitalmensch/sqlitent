@@ -37,6 +37,10 @@ def p1():
 def p2():
     return Point(33, 22)
 
+@pytest.fixture
+def p3():
+    return Point(None, None)
+
 
 @pytest.fixture
 def c1():
@@ -73,18 +77,20 @@ def test_add(db, p1, p2):
     assert p2 in db
 
 
-def test_add_idempotent(db, p1):
+def test_add_idempotent(db, p1, p3):
     # sqlitent.add is idempotent
     assert len(db) == 0
     assert p1 not in db
+    assert p3 not in db
     for _ in range(10):
         assert db.add(p1) == None
+        assert db.add(p3) == None
         assert p1 in db
-        assert len(db) == 1
+        assert p3 in db
+        assert len(db) == 2
 
 
-@pytest.mark.parametrize("other", [int, float, str, bytes, list, dict, object, tuple])
-def test_add_signature(db, p1, p2, others):
+def test_add_signature(db, p1, p2):
 
     # calling with multiple arguments should fail
     with pytest.raises(Exception):
@@ -97,7 +103,7 @@ def test_add_signature(db, p1, p2, others):
         db.add(p2, 1)
 
     # calling with anything other than a namedtuple should fail
-    for other in others:
+    for other in [int, float, str, bytes, object]:
         with pytest.raises(Exception):
             db.add(other())
 
@@ -155,27 +161,26 @@ def test_insert_mixed(db, p1, p2, c1, c2):
     assert len(db) == 4
 
 
-def test_insert_idempotent(db, p1, p2, c1):
+def test_insert_idempotent(db, p1, p3, c1):
     # sqlitent.insert is idempotent
     assert len(db) == 0
     assert p1 not in db
-    assert p2 not in db
+    assert p3 not in db
     assert c1 not in db
     for _ in range(10):
-        assert db.insert([p1], [], [[], [p2]], c1) == None
+        assert db.insert([p1], [], [[], [p3]], c1) == None
         assert p1 in db
-        assert p2 in db
+        assert p3 in db
         assert c1 in db
         assert len(db) == 3
 
 
-@pytest.mark.parametrize("other", [int, float, str, bytes, list, dict, object, tuple])
-def test_insert_signature(db, p1, c1, others):
+def test_insert_signature(db, p1, c1):
     # calling with anything other than a namedtuple should fail
-    for other in others:
+    for other in [int, float, str, bytes, object]:
         with pytest.raises(Exception):
             db.insert(c1, other(), p1)
-    for other in others:
+    for other in [int, float, str, bytes, object]:
         with pytest.raises(Exception):
             db.insert([p1], [], [[], [other()]], c1)
 
@@ -233,22 +238,30 @@ def test_remove_idempotent(populated_db, p1, p2, c1, c2):
         assert len(populated_db) == 2
 
 
-@pytest.mark.parametrize("other", [int, float, str, bytes, list, dict, object, tuple])
-def test_remove_signature(populated_db, p1, c1, others):
+def test_remove_signature_num_args(populated_db, p1, c1):
     # calling with multiple arguments should fail
     with pytest.raises(Exception):
-        populated_db.remove(p1, c1)
+        assert populated_db.remove(p1, c1) == None
 
     with pytest.raises(Exception):
-        populated_db.remove(c1, p1)
+        assert populated_db.remove(c1, p1) == None
 
     with pytest.raises(Exception):
-        populated_db.remove(p1, 1)
+        assert populated_db.remove(p1, 1) == None
 
+
+def test_remove_signature_types(populated_db):
     # calling with anything other than a namedtuple should fail
-    for other in others:
+    for other in [int, float, str, bytes, object]:
         with pytest.raises(Exception):
-            populated_db.remove(other())
+            assert populated_db.remove(other()) == None
+
+
+def test_remove_unknown_namedtuple(populated_db):
+    # removing unknown namedtuples should not do anything
+    Xyz = namedtuple('Xyz', ['a', 'b'])
+    for n in range(10):
+        assert populated_db.remove(Xyz(n, n+1)) == None
 
 
 def test_delete_one(populated_db, p1):
@@ -322,9 +335,8 @@ def test_delete_idempotent(populated_db, p1, p2, c1, c2):
         assert len(populated_db) == 0
 
 
-@pytest.mark.parametrize("other", [int, float, str, bytes, list, dict, object, tuple])
-def test_delete_signature(populated_db, p1, p2, c1, c2, others):
+def test_delete_signature(populated_db, p1, p2, c1, c2):
     # calling delete with anything other than a namedtuple should fail
-    for other in others:
+    for other in [int, float, str, bytes, object]:
         with pytest.raises(Exception):
             populated_db.delete(p1, [p2, [c2]], [c1, other()], p1)
