@@ -5,7 +5,7 @@ import pytest
 
 
 from collections import namedtuple
-from sqlitent import sqlitent, fuzzy
+from sqlitent import sqlitent
 
 
 # ## Setup
@@ -25,7 +25,7 @@ Car = namedtuple('Car', [
 
 @pytest.fixture
 def db():
-    return sqlitent(':memory:', _types=[Point, Car])
+    return sqlitent(':memory:')
 
 
 @pytest.fixture

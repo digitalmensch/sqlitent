@@ -33,7 +33,7 @@
     </div>
     <div class='code'>
       <div class="highlight"><pre><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
-<span class="kn">from</span> <span class="nn">sqlitent</span> <span class="kn">import</span> <span class="n">sqlitent</span><span class="p">,</span> <span class="n">fuzzy</span></pre></div>
+<span class="kn">from</span> <span class="nn">sqlitent</span> <span class="kn">import</span> <span class="n">sqlitent</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div>
@@ -77,7 +77,7 @@
     <div class='code'>
       <div class="highlight"><pre><span class="nd">@pytest.fixture</span>
 <span class="k">def</span> <span class="nf">db</span><span class="p">():</span>
-    <span class="k">return</span> <span class="n">sqlitent</span><span class="p">(</span><span class="s1">&#39;:memory:&#39;</span><span class="p">,</span> <span class="n">_types</span><span class="o">=</span><span class="p">[</span><span class="n">Point</span><span class="p">,</span> <span class="n">Car</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">sqlitent</span><span class="p">(</span><span class="s1">&#39;:memory:&#39;</span><span class="p">)</span>
 
 
 <span class="nd">@pytest.fixture</span>
@@ -181,8 +181,8 @@
     <span class="k">assert</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">populated_db</span>
     <span class="n">c</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">populated_db</span><span class="o">.</span><span class="n">many</span><span class="p">(</span><span class="n">Car</span><span class="p">))</span>
     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
-    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">Point</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">Point</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">Car</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">Car</span><span class="p">)</span>
     <span class="k">assert</span> <span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">populated_db</span>
     <span class="k">assert</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">populated_db</span></pre></div>
     </div>
@@ -216,7 +216,271 @@
     <span class="k">assert</span> <span class="n">c1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">c2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">assert</span> <span class="n">c1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">c2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">assert</span> <span class="n">c1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="n">c2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">populated_db</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-11'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-11'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">test_popmany</span><span class="p">(</span><span class="n">populated_db</span><span class="p">):</span>
+    <span class="n">p1</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">populated_db</span><span class="o">.</span><span class="n">many</span><span class="p">(</span><span class="n">Point</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mi">11</span><span class="p">))</span>
+    <span class="n">p2</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">populated_db</span><span class="o">.</span><span class="n">many</span><span class="p">(</span><span class="n">Point</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mi">33</span><span class="p">))</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">p1</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">p2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">p1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">Point</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">p2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">Point</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">p1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">p2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">p1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">p2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">p1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="n">p2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="n">populated_db</span><span class="o">.</span><span class="n">popmany</span><span class="p">(</span><span class="n">Point</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span> <span class="o">==</span> <span class="n">p1</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">p1</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+    <span class="k">assert</span> <span class="n">p1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="n">p2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="n">c1</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">populated_db</span><span class="o">.</span><span class="n">many</span><span class="p">(</span><span class="n">Car</span><span class="p">,</span> <span class="n">hp</span><span class="o">=</span><span class="mi">192</span><span class="p">))</span>
+    <span class="n">c2</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">populated_db</span><span class="o">.</span><span class="n">many</span><span class="p">(</span><span class="n">Car</span><span class="p">,</span> <span class="n">hp</span><span class="o">=</span><span class="mi">116</span><span class="p">))</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">c1</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">c2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">c1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">Car</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">c2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">Car</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">c1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">c2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">c1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">c2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">c1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">populated_db</span>
     <span class="k">assert</span> <span class="n">c2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="n">populated_db</span><span class="o">.</span><span class="n">popmany</span><span class="p">(</span><span class="n">Car</span><span class="p">,</span> <span class="n">hp</span><span class="o">=</span><span class="mi">192</span><span class="p">)</span> <span class="o">==</span> <span class="n">c1</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">c1</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+    <span class="k">assert</span> <span class="n">c1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="k">assert</span> <span class="n">c2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">populated_db</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-12'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-12'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">test_popmany_unknown_argument</span><span class="p">(</span><span class="n">populated_db</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+        <span class="nb">list</span><span class="p">(</span><span class="n">populated_db</span><span class="o">.</span><span class="n">popmany</span><span class="p">(</span><span class="n">Point</span><span class="p">,</span> <span class="n">partytime</span><span class="o">=</span><span class="s1">&#39;now&#39;</span><span class="p">))</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-13'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-13'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">test_popmany_missing_tupletype</span><span class="p">(</span><span class="n">populated_db</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+        <span class="nb">list</span><span class="p">(</span><span class="n">populated_db</span><span class="o">.</span><span class="n">popmany</span><span class="p">())</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-14'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-14'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">test_popmany_unknown_tuple</span><span class="p">(</span><span class="n">populated_db</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">populated_db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span>
+    <span class="k">assert</span> <span class="nb">list</span><span class="p">(</span><span class="n">populated_db</span><span class="o">.</span><span class="n">popmany</span><span class="p">(</span><span class="n">Point</span><span class="p">,</span> <span class="n">x</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">y</span><span class="o">=-</span><span class="mi">1</span><span class="p">))</span> <span class="o">==</span> <span class="p">[]</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">populated_db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-15'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-15'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">test_popmany_type</span><span class="p">(</span><span class="n">populated_db</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">populated_db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span>
+    <span class="n">ps</span> <span class="o">=</span> <span class="n">populated_db</span><span class="o">.</span><span class="n">popmany</span><span class="p">(</span><span class="n">Point</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">ps</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">populated_db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+    <span class="n">cs</span> <span class="o">=</span> <span class="n">populated_db</span><span class="o">.</span><span class="n">popmany</span><span class="p">(</span><span class="n">Car</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">cs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">populated_db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-16'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-16'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">test_one_unknown_argument</span><span class="p">(</span><span class="n">populated_db</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+        <span class="n">populated_db</span><span class="o">.</span><span class="n">one</span><span class="p">(</span><span class="n">Point</span><span class="p">,</span> <span class="n">partytime</span><span class="o">=</span><span class="s1">&#39;now&#39;</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-17'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-17'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">test_one_missing_tupletype</span><span class="p">(</span><span class="n">populated_db</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+        <span class="n">populated_db</span><span class="o">.</span><span class="n">one</span><span class="p">()</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-18'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-18'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">test_one_unknown_tuple</span><span class="p">(</span><span class="n">populated_db</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">populated_db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span>
+    <span class="k">assert</span> <span class="n">populated_db</span><span class="o">.</span><span class="n">one</span><span class="p">(</span><span class="n">Point</span><span class="p">,</span> <span class="n">x</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">y</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">None</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">populated_db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-19'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-19'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">test_pop_unknown_argument</span><span class="p">(</span><span class="n">populated_db</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+        <span class="n">populated_db</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">Point</span><span class="p">,</span> <span class="n">partytime</span><span class="o">=</span><span class="s1">&#39;now&#39;</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-20'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-20'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">test_pop_missing_tupletype</span><span class="p">(</span><span class="n">populated_db</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+        <span class="n">populated_db</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-21'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-21'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">test_pop_unknown_tuple</span><span class="p">(</span><span class="n">populated_db</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">populated_db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span>
+    <span class="k">assert</span> <span class="n">populated_db</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">Point</span><span class="p">,</span> <span class="n">x</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">y</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">None</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">populated_db</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-22'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-22'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">test_one_type</span><span class="p">(</span><span class="n">populated_db</span><span class="p">):</span>
+    <span class="n">p1</span> <span class="o">=</span> <span class="n">populated_db</span><span class="o">.</span><span class="n">one</span><span class="p">(</span><span class="n">Point</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
+    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="n">c1</span> <span class="o">=</span> <span class="n">populated_db</span><span class="o">.</span><span class="n">one</span><span class="p">(</span><span class="n">Car</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">c1</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
+    <span class="k">assert</span> <span class="n">c1</span> <span class="ow">in</span> <span class="n">populated_db</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-23'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-23'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">test_pop_type</span><span class="p">(</span><span class="n">populated_db</span><span class="p">):</span>
+    <span class="n">p1</span> <span class="o">=</span> <span class="n">populated_db</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">Point</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
+    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="n">c1</span> <span class="o">=</span> <span class="n">populated_db</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">Car</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">c1</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
+    <span class="k">assert</span> <span class="n">c1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-24'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-24'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">test_one_criteria</span><span class="p">(</span><span class="n">populated_db</span><span class="p">):</span>
+    <span class="n">p1</span> <span class="o">=</span> <span class="n">populated_db</span><span class="o">.</span><span class="n">one</span><span class="p">(</span><span class="n">Point</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">22</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
+    <span class="k">assert</span> <span class="mi">22</span> <span class="o">==</span> <span class="n">p1</span><span class="o">.</span><span class="n">y</span>
+    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="n">c1</span> <span class="o">=</span> <span class="n">populated_db</span><span class="o">.</span><span class="n">one</span><span class="p">(</span><span class="n">Car</span><span class="p">,</span> <span class="n">hp</span><span class="o">=</span><span class="mi">116</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">c1</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
+    <span class="k">assert</span> <span class="mi">116</span> <span class="o">==</span> <span class="n">c1</span><span class="o">.</span><span class="n">hp</span>
+    <span class="k">assert</span> <span class="n">c1</span> <span class="ow">in</span> <span class="n">populated_db</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-25'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-25'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">test_pop_criteria</span><span class="p">(</span><span class="n">populated_db</span><span class="p">):</span>
+    <span class="n">p1</span> <span class="o">=</span> <span class="n">populated_db</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">Point</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">22</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
+    <span class="k">assert</span> <span class="mi">22</span> <span class="o">==</span> <span class="n">p1</span><span class="o">.</span><span class="n">y</span>
+    <span class="k">assert</span> <span class="n">p1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>
+    <span class="n">c1</span> <span class="o">=</span> <span class="n">populated_db</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">Car</span><span class="p">,</span> <span class="n">hp</span><span class="o">=</span><span class="mi">116</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">c1</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
+    <span class="k">assert</span> <span class="mi">116</span> <span class="o">==</span> <span class="n">c1</span><span class="o">.</span><span class="n">hp</span>
+    <span class="k">assert</span> <span class="n">c1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">populated_db</span>
 
 </pre></div>
     </div>

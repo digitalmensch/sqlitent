@@ -1,20 +1,21 @@
 import collections.abc
 import sqlite3
-import operator
+import pickle
 import itertools
+import types
 
-class fuzzy(object):
-    pass
 
 class sqlitent(collections.abc.Collection):
 
-    def __init__(self, database, _types={}):
+    def __init__(self, database, encode=pickle.dumps, decode=pickle.loads):
         self.__db = sqlite3.connect(database)
         self.__insert_cache = {}
         self.__select_cache = {}
         self.__single_cache = {}
         self.__count_cache = {}
         self.__delete_cache = {}
+        self.__encode = encode
+        self.__decode = decode
 
     def __isnamedtuple(self, nt):
         return isinstance(nt, tuple) and hasattr(nt, '_fields') and \
@@ -140,3 +141,46 @@ class sqlitent(collections.abc.Collection):
         tmp = set(self.__to_ntlist(nts))
         for nt in tmp:
             self.remove(nt)
+
+    def one(self, _type, **kwargs):
+        for nt in self.many(_type, **kwargs):
+            return nt
+        return None
+
+    def pop(self, _type, **kwargs):
+        tmp = self.one(_type, **kwargs)
+        if tmp is not None:
+            self.remove(tmp)
+        return tmp
+
+    def many(self, _type, **kwargs):
+        if not all(k in _type._fields for k in kwargs):
+            raise Exception(f'{_type} doesn\'t have one of your keywords')
+
+        clauses = []
+        sqlparams = []
+        filters = []
+        for field, value in sorted(kwargs.items()):
+            if isinstance(value, types.FunctionType):
+                filters.append(lambda t: value(getattr(t, field)))
+            else:
+                clauses.append(f'{self.__getsqlname(field)} IS ?')
+                sqlparams.append(value)
+
+        table = self.__getsqlname(_type.__name__)
+        stmt = f'SELECT * FROM {table}' + (' WHERE ' + ' AND '.join(clauses) if clauses else '') + ';'
+
+        it = self.__execute(stmt, sqlparams)
+        print(it)
+        it = map(_type._make, it)
+        print(it)
+        for fn in filters:
+            it = filter(fn, it)
+            print(fn, it)
+
+        yield from it
+
+    def popmany(self, _type, **kwargs):
+        tmp = list(self.many(_type, **kwargs))
+        self.delete(tmp)
+        return tmp
