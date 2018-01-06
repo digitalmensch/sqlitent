@@ -340,3 +340,19 @@ def test_delete_signature(populated_db, p1, p2, c1, c2):
     for other in [int, float, str, bytes, object]:
         with pytest.raises(Exception):
             populated_db.delete(p1, [p2, [c2]], [c1, other()], p1)
+
+
+# ## Getting namedtuples
+
+
+def test_iter(populated_db, p1, p2, p3, c1, c2):
+    xs = [p1, p2, p3, c1, c2]
+    assert populated_db.insert(xs) == None
+    n = len(populated_db)
+    assert 5 == n
+    assert populated_db.insert(xs) == None
+    assert len(populated_db) == n
+    for x in xs:
+        assert x in populated_db
+    for x in populated_db:
+        assert x in xs
