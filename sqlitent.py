@@ -43,7 +43,17 @@ def _identity(something):
 
 
 def _istrivial(val):
-    return val in (type(None), int, float, str, bytes)
+    return val  in (type(None), int, float, str, bytes) or \
+      type(val) in (type(None), int, float, str, bytes)
+
+
+def _flatten(it):
+    if hasattr(type(it), '__bases__') and tuple in type(it).__bases__ and hasattr(it, '_fields'):
+        yield it
+    elif isinstance(it, (tuple, list, set)):
+        yield from itertools.chain.from_iterable(map(_flatten, it))
+    else:
+        raise Exception('datatype!')
 
 
 ################################################################################
@@ -54,14 +64,6 @@ class sqlitent(collections.abc.Collection):
 
     def __init__(self, database, encode=pickle.dumps, decode=pickle.loads):
         self.__db = sqlite3.connect(database)
-        self.__insert_cache = {}
-        self.__select_cache = {}
-        self.__single_cache = {}
-        self.__count_cache = {}
-        self.__delete_cache = {}
-        self.__encode = encode
-        self.__decode = decode
-        self.__tup = set()
 
         # We need to keep track of recognized namedtuples and how to encode
         # and decode them.
@@ -75,15 +77,9 @@ class sqlitent(collections.abc.Collection):
         self.__delete_stmt = {}
         self.__count_stmt = {}
 
-    def __register(self, tupletype, **fields):
-        ''' Register a namedtuple with the database. Creates a table in the
-            database if necessary and prepares all required SQL statements.
-            >>> Pal = collections.namedtuple('Pal', ['name', 'age'])
-            >>> db = sqlitent(':memory:')
-            >>> db.register(Pal, name=str, age=int)
-            >>>
-        '''
-
+    def __register(self, tupletype, fields):
+        # Registers a namedtuple with the database. All fields in the tupletype
+        # need to be mapped to a trivial type in fields.
         print(self)
         print(tupletype)
         print(tupletype.__bases__)
@@ -145,58 +141,14 @@ class sqlitent(collections.abc.Collection):
         cols = ','.join(map(_sqlname, fieldtypes.keys()))
         return f'CREATE TABLE IF NOT EXISTS {_sqlname(name)} ({defs}, UNIQUE ({cols}));'
 
-    def __isnamedtuple(self, nt):
-        return isinstance(nt, tuple) and hasattr(nt, '_fields') and \
-                   all(hasattr(nt, n) for n in nt._fields) and \
-                   hasattr(nt, '_source') and hasattr(nt, '_replace') and \
-                   hasattr(nt, '_asdict')
-
-    def __assert_is_namedtuple(self, nt):
-        if not self.__isnamedtuple(nt):
-            raise Exception(f'expected namedtuple, instead got {type(nt)}: {nt}')
-
-    def __tablename(self, nt):
-        return _sqlname(type(nt).__name__)
+    def __assert_registered(self, tupletype):
+        if tupletype not in self.__tupletypes:
+            raise Exception(f'unknown tupletype: {tupletype}')
 
     def __execute(self, stmt, *args, **kwargs):
-        print(stmt)
-        print(args)
-        print(kwargs)
-        return self.__db.cursor().execute(stmt, *args, **kwargs)
-
-    def __setuptable(self, nt):
-        self.__register(type(nt), **dict((f, type(v)) for f, v in zip(nt._fields, nt)))
-
-        table = self.__tablename(nt)
-        nt_type = type(nt)
-        fields = ','.join(_sqlname(field) for field in nt._fields)
-
-        # build and cache the insert statement
-        stmt = f'INSERT OR IGNORE INTO {table} ({fields})'
-        stmt += 'VALUES (' + ','.join(['?'] * len(nt)) + ');'
-        self.__insert_cache[nt_type] = stmt
-
-        # build and cache the delete statement for a fully specified tuple
-        stmt = ' AND '.join(f'{_sqlname(f)} IS ?' for f in nt._fields)
-        stmt = f'DELETE FROM {table} WHERE {stmt};'
-        self.__delete_cache[nt_type] = stmt
-
-    def __to_ntlist(self, it):
-        def _flatten(it):
-            if isinstance(it, str) or isinstance(it, bytes):
-                # these need to be handled first because they cause infinite recursion
-                raise Exception(f'expected namedtuple, instead got {type(it)}: {it}')
-            elif isinstance(it, collections.abc.Iterable):
-                if self.__isnamedtuple(it):
-                    yield it
-                else:
-                    yield from itertools.chain.from_iterable(map(_flatten, it))
-            else:
-                yield it
-        for value in _flatten(it):
-            if not self.__isnamedtuple(value):
-                raise Exception(f'expected namedtuple, instead got {type(value)}: {value}')
-            yield value
+        cur = self.__db.cursor().execute(stmt, *args, **kwargs)
+        self.__db.commit()
+        return cur
 
     def __contains__(self, nt):
         if type(nt) not in self.__tupletypes:
@@ -213,46 +165,93 @@ class sqlitent(collections.abc.Collection):
         return sum(self.__execute(self.__count_stmt[t]).fetchone()[0] for t in self.__tupletypes)
 
     def add(self, nt):
-        self.__assert_is_namedtuple(nt)
+        ''' Add a namedtuple to the database. Registers the namedtuple class
+            with the database if necessary.
+            >>> Pal = collections.namedtuple('Pal', ['name', 'age'])
+            >>> db = sqlitent(':memory:')
+            >>> p = Pal('Jim', 35)
+            >>> db.remove(p)
+        '''
+
         tupletype = type(nt)
         if tupletype not in self.__tupletypes:
-            print('========= NEW =========')
-            print(tupletype)
-            print(nt)
-            self.__register(tupletype, **{f: type(v) for f, v in nt._asdict().items()})
+            self.__register(tupletype, {f: type(v) for f, v in nt._asdict().items()})
         if None in nt and nt in self:
-            # abort if exists, because NULL doesn't violate uniqueness in Sqlite
-            return
+            return # abort if exists, because Sqlite's NULL isn't unique
         self.__execute(self.__insert_stmt[tupletype], nt)
-        self.__db.commit()
 
     def insert(self, *nts):
-        tmp = set(self.__to_ntlist(nts))
-        for nt in tmp:
-            self.add(nt)
+        ''' Insert one or more namedtuples to the database.
+            >>> Pal = collections.namedtuple('Pal', ['name', 'age'])
+            >>> db = sqlitent(':memory:')
+            >>> p = Pal('Jim', 35)
+            >>> db.remove(p)
+        '''
+
+        for tup in set(_flatten(nts)):
+            self.add(tup)
 
     def remove(self, nt):
+        ''' Remove one matching namedtuple from the database.
+            >>> Pal = collections.namedtuple('Pal', ['name', 'age'])
+            >>> db = sqlitent(':memory:')
+            >>> p = Pal('Jim', 35)
+            >>> db.remove(p)
+        '''
+
         tupletype = type(nt)
-        if tupletype not in self.__tupletypes:
-            raise Exception(f'unknown tupletype: {tupletype}')
+        self.__assert_registered(tupletype)
         self.__execute(self.__delete_stmt[tupletype], nt)
 
     def delete(self, *nts):
-        for nt in set(self.__to_ntlist(nts)):
-            self.remove(nt)
+        ''' Remove one or more namedtuples from the database.
+            >>> Pal = collections.namedtuple('Pal', ['name', 'age'])
+            >>> db = sqlitent(':memory:')
+            >>> p = Pal('Jim', 35)
+            >>> db.delete([p, p])
+        '''
 
-    def one(self, nt_type, **kwargs):
-        for nt in self.many(nt_type, **kwargs):
-            return nt
+        for tup in set(_flatten(nts)):
+            self.remove(tup)
+
+    def one(self, tupletype, **kwargs):
+        ''' Return one matching namedtuple or None.
+            >>> Pal = collections.namedtuple('Pal', ['name', 'age'])
+            >>> db = sqlitent(':memory:')
+            >>> p = Pal('Jim', 35)
+            >>> db.one(Pal, name='Jim')
+            Pal('Jim', 35)
+        '''
+
+        self.__assert_registered(tupletype)
+        for tup in self.many(tupletype, **kwargs):
+            return tup
         return None
 
-    def pop(self, nt_type, **kwargs):
-        tmp = self.one(nt_type, **kwargs)
-        if tmp is not None:
-            self.remove(tmp)
-        return tmp
+    def pop(self, tupletype, **kwargs):
+        ''' Return one matching namedtuple or None and remove the returned
+            namedtuple from the database.
+            >>> Pal = collections.namedtuple('Pal', ['name', 'age'])
+            >>> db = sqlitent(':memory:')
+            >>> p = Pal('Jim', 35)
+            >>> db.pop(Pal, name='Jim')
+            Pal('Jim', 35)
+        '''
+
+        self.__assert_registered(tupletype)
+        tup = self.one(tupletype, **kwargs)
+        if tup is not None:
+            self.remove(tup)
+        return tup
 
     def many(self, tupletype, **kwargs):
+        ''' Return zero or more matching namedtuples.
+            >>> Pal = collections.namedtuple('Pal', ['name', 'age'])
+            >>> db = sqlitent(':memory:')
+            >>> db.many(Pal, name='Jim')
+            [...]
+        '''
+
         if not all(k in tupletype._fields for k in kwargs):
             raise Exception(f'{tupletype} doesn\'t have one of your keywords')
         if tupletype not in self.__tupletypes:
@@ -278,7 +277,15 @@ class sqlitent(collections.abc.Collection):
 
         yield from it
 
-    def popmany(self, nt_type, **kwargs):
-        tmp = list(self.many(nt_type, **kwargs))
-        self.delete(tmp)
-        return tmp
+    def popmany(self, tupletype, **kwargs):
+        ''' Return zero or more matching namedtuples and removes them
+            from the database.
+            >>> Pal = collections.namedtuple('Pal', ['name', 'age'])
+            >>> db = sqlitent(':memory:')
+            >>> db.popmany(Pal, name='Jim')
+            [...]
+        '''
+
+        tups = list(self.many(tupletype, **kwargs))
+        self.delete(tups)
+        return tups

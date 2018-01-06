@@ -112,7 +112,8 @@
     </div>
     <div class='code'>
       <div class="highlight"><pre><span class="k">def</span> <span class="nf">_istrivial</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">val</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">None</span><span class="p">),</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span></pre></div>
+    <span class="k">return</span> <span class="n">val</span>  <span class="ow">in</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">None</span><span class="p">),</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span> <span class="ow">or</span> \
+      <span class="nb">type</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">None</span><span class="p">),</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div>
@@ -121,12 +122,16 @@
       <div class='octowrap'>
         <a class='octothorpe' href='#section-6'>#</a>
       </div>
-      <h6></h6>
-<p>sqlitent API</p>
-<h6></h6>
+      
     </div>
     <div class='code'>
-      <div class="highlight"><pre></pre></div>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">_flatten</span><span class="p">(</span><span class="n">it</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">it</span><span class="p">),</span> <span class="s1">&#39;__bases__&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">tuple</span> <span class="ow">in</span> <span class="nb">type</span><span class="p">(</span><span class="n">it</span><span class="p">)</span><span class="o">.</span><span class="vm">__bases__</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="s1">&#39;_fields&#39;</span><span class="p">):</span>
+        <span class="k">yield</span> <span class="n">it</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="nb">set</span><span class="p">)):</span>
+        <span class="k">yield from</span> <span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">_flatten</span><span class="p">,</span> <span class="n">it</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;datatype!&#39;</span><span class="p">)</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div>
@@ -135,10 +140,12 @@
       <div class='octowrap'>
         <a class='octothorpe' href='#section-7'>#</a>
       </div>
-      
+      <h6></h6>
+<p>sqlitent API</p>
+<h6></h6>
     </div>
     <div class='code'>
-      <div class="highlight"><pre><span class="k">class</span> <span class="nc">sqlitent</span><span class="p">(</span><span class="n">collections</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">Collection</span><span class="p">):</span></pre></div>
+      <div class="highlight"><pre></pre></div>
     </div>
   </div>
   <div class='clearall'></div>
@@ -150,16 +157,7 @@
       
     </div>
     <div class='code'>
-      <div class="highlight"><pre>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">database</span><span class="p">,</span> <span class="n">encode</span><span class="o">=</span><span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">,</span> <span class="n">decode</span><span class="o">=</span><span class="n">pickle</span><span class="o">.</span><span class="n">loads</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__db</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">database</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__insert_cache</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__select_cache</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__single_cache</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__count_cache</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__delete_cache</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__encode</span> <span class="o">=</span> <span class="n">encode</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__decode</span> <span class="o">=</span> <span class="n">decode</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__tup</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span></pre></div>
+      <div class="highlight"><pre><span class="k">class</span> <span class="nc">sqlitent</span><span class="p">(</span><span class="n">collections</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">Collection</span><span class="p">):</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div>
@@ -167,6 +165,19 @@
     <div class='docs'>
       <div class='octowrap'>
         <a class='octothorpe' href='#section-9'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">database</span><span class="p">,</span> <span class="n">encode</span><span class="o">=</span><span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">,</span> <span class="n">decode</span><span class="o">=</span><span class="n">pickle</span><span class="o">.</span><span class="n">loads</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__db</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">database</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-10'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-10'>#</a>
       </div>
       <p>We need to keep track of recognized namedtuples and how to encode
 and decode them.</p>
@@ -178,10 +189,10 @@ and decode them.</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-10'>
+  <div class='section' id='section-11'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-10'>#</a>
+        <a class='octothorpe' href='#section-11'>#</a>
       </div>
       <p>We cache frequently used SQL statements</p>
     </div>
@@ -193,34 +204,38 @@ and decode them.</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-11'>
+  <div class='section' id='section-12'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-11'>#</a>
+        <a class='octothorpe' href='#section-12'>#</a>
       </div>
       
     </div>
     <div class='code'>
-      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">__register</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tupletype</span><span class="p">,</span> <span class="o">**</span><span class="n">fields</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39; Register a namedtuple with the database. Creates a table in the</span>
-<span class="sd">            database if necessary and prepares all required SQL statements.</span>
-<span class="sd">            &gt;&gt;&gt; Pal = collections.namedtuple(&#39;Pal&#39;, [&#39;name&#39;, &#39;age&#39;])</span>
-<span class="sd">            &gt;&gt;&gt; db = sqlitent(&#39;:memory:&#39;)</span>
-<span class="sd">            &gt;&gt;&gt; db.register(Pal, name=str, age=int)</span>
-<span class="sd">            &gt;&gt;&gt;</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-
-        <span class="k">print</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">__register</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tupletype</span><span class="p">,</span> <span class="n">fields</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-13'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-13'>#</a>
+      </div>
+      <p>Registers a namedtuple with the database. All fields in the tupletype
+need to be mapped to a trivial type in fields.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>        <span class="k">print</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="k">print</span><span class="p">(</span><span class="n">tupletype</span><span class="p">)</span>
         <span class="k">print</span><span class="p">(</span><span class="n">tupletype</span><span class="o">.</span><span class="vm">__bases__</span><span class="p">)</span>
         <span class="k">print</span><span class="p">(</span><span class="n">fields</span><span class="p">)</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-12'>
+  <div class='section' id='section-14'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-12'>#</a>
+        <a class='octothorpe' href='#section-14'>#</a>
       </div>
       <p>Is tupletupe really a namedtuple?</p>
     </div>
@@ -235,10 +250,10 @@ and decode them.</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-13'>
+  <div class='section' id='section-15'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-13'>#</a>
+        <a class='octothorpe' href='#section-15'>#</a>
       </div>
       <p>We require that all fields in the namedtuple are typed to create a
 typed database table and handle encoding complex types.</p>
@@ -252,10 +267,10 @@ typed database table and handle encoding complex types.</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-14'>
+  <div class='section' id='section-16'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-14'>#</a>
+        <a class='octothorpe' href='#section-16'>#</a>
       </div>
       
     </div>
@@ -267,10 +282,10 @@ typed database table and handle encoding complex types.</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-15'>
+  <div class='section' id='section-17'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-15'>#</a>
+        <a class='octothorpe' href='#section-17'>#</a>
       </div>
       
     </div>
@@ -286,46 +301,16 @@ typed database table and handle encoding complex types.</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-16'>
+  <div class='section' id='section-18'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-16'>#</a>
+        <a class='octothorpe' href='#section-18'>#</a>
       </div>
       <p>If we get to this point, everything is ready to deal instances of
 tupletype. Hence tupletype is added to the recognized namedtuples.</p>
     </div>
     <div class='code'>
       <div class="highlight"><pre>        <span class="bp">self</span><span class="o">.</span><span class="n">__tupletypes</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tupletype</span><span class="p">)</span></pre></div>
-    </div>
-  </div>
-  <div class='clearall'></div>
-  <div class='section' id='section-17'>
-    <div class='docs'>
-      <div class='octowrap'>
-        <a class='octothorpe' href='#section-17'>#</a>
-      </div>
-      
-    </div>
-    <div class='code'>
-      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">__build_insert_stmt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">fieldnames</span><span class="p">):</span>
-        <span class="n">cols</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">_sqlname</span><span class="p">,</span> <span class="n">fieldnames</span><span class="p">))</span>
-        <span class="n">gaps</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;?&#39;</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">fieldnames</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">f</span><span class="s1">&#39;INSERT OR IGNORE INTO {_sqlname(name)} ({cols}) VALUES ({gaps});&#39;</span></pre></div>
-    </div>
-  </div>
-  <div class='clearall'></div>
-  <div class='section' id='section-18'>
-    <div class='docs'>
-      <div class='octowrap'>
-        <a class='octothorpe' href='#section-18'>#</a>
-      </div>
-      
-    </div>
-    <div class='code'>
-      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">__build_select_stmt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">fieldnames</span><span class="o">=</span><span class="p">[]):</span>
-        <span class="n">clauses</span> <span class="o">=</span> <span class="s1">&#39; AND &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{_sqlname(f)} IS ?&#39;</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fieldnames</span><span class="p">)</span>
-        <span class="n">where</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39; WHERE {clauses}&#39;</span> <span class="k">if</span> <span class="n">clauses</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
-        <span class="k">return</span> <span class="n">f</span><span class="s1">&#39;SELECT * FROM {_sqlname(name)}{where};&#39;</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div>
@@ -337,10 +322,10 @@ tupletype. Hence tupletype is added to the recognized namedtuples.</p>
       
     </div>
     <div class='code'>
-      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">__build_delete_stmt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">fieldnames</span><span class="o">=</span><span class="p">[]):</span>
-        <span class="n">clauses</span> <span class="o">=</span> <span class="s1">&#39; AND &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{_sqlname(f)} IS ?&#39;</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fieldnames</span><span class="p">)</span>
-        <span class="n">where</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39; WHERE {clauses}&#39;</span> <span class="k">if</span> <span class="n">clauses</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
-        <span class="k">return</span> <span class="n">f</span><span class="s1">&#39;DELETE FROM {_sqlname(name)}{where};&#39;</span></pre></div>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">__build_insert_stmt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">fieldnames</span><span class="p">):</span>
+        <span class="n">cols</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">_sqlname</span><span class="p">,</span> <span class="n">fieldnames</span><span class="p">))</span>
+        <span class="n">gaps</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;?&#39;</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">fieldnames</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">f</span><span class="s1">&#39;INSERT OR IGNORE INTO {_sqlname(name)} ({cols}) VALUES ({gaps});&#39;</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div>
@@ -352,8 +337,10 @@ tupletype. Hence tupletype is added to the recognized namedtuples.</p>
       
     </div>
     <div class='code'>
-      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">__build_count_stmt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">f</span><span class="s1">&#39;SELECT count(*) FROM {_sqlname(name)};&#39;</span></pre></div>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">__build_select_stmt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">fieldnames</span><span class="o">=</span><span class="p">[]):</span>
+        <span class="n">clauses</span> <span class="o">=</span> <span class="s1">&#39; AND &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{_sqlname(f)} IS ?&#39;</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fieldnames</span><span class="p">)</span>
+        <span class="n">where</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39; WHERE {clauses}&#39;</span> <span class="k">if</span> <span class="n">clauses</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">return</span> <span class="n">f</span><span class="s1">&#39;SELECT * FROM {_sqlname(name)}{where};&#39;</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div>
@@ -365,10 +352,10 @@ tupletype. Hence tupletype is added to the recognized namedtuples.</p>
       
     </div>
     <div class='code'>
-      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">__build_create_table_stmt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">fieldtypes</span><span class="p">):</span>
-        <span class="n">defs</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{_sqlname(f)} {_sqltype(v)}&#39;</span> <span class="k">for</span> <span class="n">f</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">fieldtypes</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
-        <span class="n">cols</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">_sqlname</span><span class="p">,</span> <span class="n">fieldtypes</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
-        <span class="k">return</span> <span class="n">f</span><span class="s1">&#39;CREATE TABLE IF NOT EXISTS {_sqlname(name)} ({defs}, UNIQUE ({cols}));&#39;</span></pre></div>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">__build_delete_stmt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">fieldnames</span><span class="o">=</span><span class="p">[]):</span>
+        <span class="n">clauses</span> <span class="o">=</span> <span class="s1">&#39; AND &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{_sqlname(f)} IS ?&#39;</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fieldnames</span><span class="p">)</span>
+        <span class="n">where</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39; WHERE {clauses}&#39;</span> <span class="k">if</span> <span class="n">clauses</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">return</span> <span class="n">f</span><span class="s1">&#39;DELETE FROM {_sqlname(name)}{where};&#39;</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div>
@@ -380,11 +367,8 @@ tupletype. Hence tupletype is added to the recognized namedtuples.</p>
       
     </div>
     <div class='code'>
-      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">__isnamedtuple</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nt</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">nt</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">nt</span><span class="p">,</span> <span class="s1">&#39;_fields&#39;</span><span class="p">)</span> <span class="ow">and</span> \
-                   <span class="nb">all</span><span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="n">nt</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">nt</span><span class="o">.</span><span class="n">_fields</span><span class="p">)</span> <span class="ow">and</span> \
-                   <span class="nb">hasattr</span><span class="p">(</span><span class="n">nt</span><span class="p">,</span> <span class="s1">&#39;_source&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">nt</span><span class="p">,</span> <span class="s1">&#39;_replace&#39;</span><span class="p">)</span> <span class="ow">and</span> \
-                   <span class="nb">hasattr</span><span class="p">(</span><span class="n">nt</span><span class="p">,</span> <span class="s1">&#39;_asdict&#39;</span><span class="p">)</span></pre></div>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">__build_count_stmt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">f</span><span class="s1">&#39;SELECT count(*) FROM {_sqlname(name)};&#39;</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div>
@@ -396,9 +380,10 @@ tupletype. Hence tupletype is added to the recognized namedtuples.</p>
       
     </div>
     <div class='code'>
-      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">__assert_is_namedtuple</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nt</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__isnamedtuple</span><span class="p">(</span><span class="n">nt</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;expected namedtuple, instead got {type(nt)}: {nt}&#39;</span><span class="p">)</span></pre></div>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">__build_create_table_stmt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">fieldtypes</span><span class="p">):</span>
+        <span class="n">defs</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{_sqlname(f)} {_sqltype(v)}&#39;</span> <span class="k">for</span> <span class="n">f</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">fieldtypes</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+        <span class="n">cols</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">_sqlname</span><span class="p">,</span> <span class="n">fieldtypes</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+        <span class="k">return</span> <span class="n">f</span><span class="s1">&#39;CREATE TABLE IF NOT EXISTS {_sqlname(name)} ({defs}, UNIQUE ({cols}));&#39;</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div>
@@ -410,8 +395,9 @@ tupletype. Hence tupletype is added to the recognized namedtuples.</p>
       
     </div>
     <div class='code'>
-      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">__tablename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nt</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">_sqlname</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">nt</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span></pre></div>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">__assert_registered</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tupletype</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">tupletype</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tupletypes</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;unknown tupletype: {tupletype}&#39;</span><span class="p">)</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div>
@@ -424,10 +410,9 @@ tupletype. Hence tupletype is added to the recognized namedtuples.</p>
     </div>
     <div class='code'>
       <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">__execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stmt</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">print</span><span class="p">(</span><span class="n">stmt</span><span class="p">)</span>
-        <span class="k">print</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
-        <span class="k">print</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__db</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">stmt</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></pre></div>
+        <span class="n">cur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__db</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">stmt</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">cur</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div>
@@ -439,99 +424,6 @@ tupletype. Hence tupletype is added to the recognized namedtuples.</p>
       
     </div>
     <div class='code'>
-      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">__setuptable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nt</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__register</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">nt</span><span class="p">),</span> <span class="o">**</span><span class="nb">dict</span><span class="p">((</span><span class="n">f</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="k">for</span> <span class="n">f</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">nt</span><span class="o">.</span><span class="n">_fields</span><span class="p">,</span> <span class="n">nt</span><span class="p">)))</span>
-
-        <span class="n">table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tablename</span><span class="p">(</span><span class="n">nt</span><span class="p">)</span>
-        <span class="n">nt_type</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">nt</span><span class="p">)</span>
-        <span class="n">fields</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_sqlname</span><span class="p">(</span><span class="n">field</span><span class="p">)</span> <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">nt</span><span class="o">.</span><span class="n">_fields</span><span class="p">)</span></pre></div>
-    </div>
-  </div>
-  <div class='clearall'></div>
-  <div class='section' id='section-27'>
-    <div class='docs'>
-      <div class='octowrap'>
-        <a class='octothorpe' href='#section-27'>#</a>
-      </div>
-      <p>build and cache the insert statement</p>
-    </div>
-    <div class='code'>
-      <div class="highlight"><pre>        <span class="n">stmt</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;INSERT OR IGNORE INTO {table} ({fields})&#39;</span>
-        <span class="n">stmt</span> <span class="o">+=</span> <span class="s1">&#39;VALUES (&#39;</span> <span class="o">+</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;?&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">nt</span><span class="p">))</span> <span class="o">+</span> <span class="s1">&#39;);&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__insert_cache</span><span class="p">[</span><span class="n">nt_type</span><span class="p">]</span> <span class="o">=</span> <span class="n">stmt</span></pre></div>
-    </div>
-  </div>
-  <div class='clearall'></div>
-  <div class='section' id='section-28'>
-    <div class='docs'>
-      <div class='octowrap'>
-        <a class='octothorpe' href='#section-28'>#</a>
-      </div>
-      <p>build and cache the delete statement for a fully specified tuple</p>
-    </div>
-    <div class='code'>
-      <div class="highlight"><pre>        <span class="n">stmt</span> <span class="o">=</span> <span class="s1">&#39; AND &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{_sqlname(f)} IS ?&#39;</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">nt</span><span class="o">.</span><span class="n">_fields</span><span class="p">)</span>
-        <span class="n">stmt</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;DELETE FROM {table} WHERE {stmt};&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__delete_cache</span><span class="p">[</span><span class="n">nt_type</span><span class="p">]</span> <span class="o">=</span> <span class="n">stmt</span></pre></div>
-    </div>
-  </div>
-  <div class='clearall'></div>
-  <div class='section' id='section-29'>
-    <div class='docs'>
-      <div class='octowrap'>
-        <a class='octothorpe' href='#section-29'>#</a>
-      </div>
-      
-    </div>
-    <div class='code'>
-      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">__to_ntlist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">it</span><span class="p">):</span></pre></div>
-    </div>
-  </div>
-  <div class='clearall'></div>
-  <div class='section' id='section-30'>
-    <div class='docs'>
-      <div class='octowrap'>
-        <a class='octothorpe' href='#section-30'>#</a>
-      </div>
-      
-    </div>
-    <div class='code'>
-      <div class="highlight"><pre>        <span class="k">def</span> <span class="nf">_flatten</span><span class="p">(</span><span class="n">it</span><span class="p">):</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span></pre></div>
-    </div>
-  </div>
-  <div class='clearall'></div>
-  <div class='section' id='section-31'>
-    <div class='docs'>
-      <div class='octowrap'>
-        <a class='octothorpe' href='#section-31'>#</a>
-      </div>
-      <p>these need to be handled first because they cause infinite recursion</p>
-    </div>
-    <div class='code'>
-      <div class="highlight"><pre>                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;expected namedtuple, instead got {type(it)}: {it}&#39;</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">Iterable</span><span class="p">):</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__isnamedtuple</span><span class="p">(</span><span class="n">it</span><span class="p">):</span>
-                    <span class="k">yield</span> <span class="n">it</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="k">yield from</span> <span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">_flatten</span><span class="p">,</span> <span class="n">it</span><span class="p">))</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">yield</span> <span class="n">it</span>
-        <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">_flatten</span><span class="p">(</span><span class="n">it</span><span class="p">):</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__isnamedtuple</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;expected namedtuple, instead got {type(value)}: {value}&#39;</span><span class="p">)</span>
-            <span class="k">yield</span> <span class="n">value</span></pre></div>
-    </div>
-  </div>
-  <div class='clearall'></div>
-  <div class='section' id='section-32'>
-    <div class='docs'>
-      <div class='octowrap'>
-        <a class='octothorpe' href='#section-32'>#</a>
-      </div>
-      
-    </div>
-    <div class='code'>
       <div class="highlight"><pre>    <span class="k">def</span> <span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nt</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">nt</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tupletypes</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">False</span>
@@ -539,10 +431,10 @@ tupletype. Hence tupletype is added to the recognized namedtuples.</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-33'>
+  <div class='section' id='section-27'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-33'>#</a>
+        <a class='octothorpe' href='#section-27'>#</a>
       </div>
       
     </div>
@@ -555,6 +447,133 @@ tupletype. Hence tupletype is added to the recognized namedtuples.</p>
     </div>
   </div>
   <div class='clearall'></div>
+  <div class='section' id='section-28'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-28'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__execute</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__count_stmt</span><span class="p">[</span><span class="n">t</span><span class="p">])</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tupletypes</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-29'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-29'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nt</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Add a namedtuple to the database. Registers the namedtuple class</span>
+<span class="sd">            with the database if necessary.</span>
+<span class="sd">            &gt;&gt;&gt; Pal = collections.namedtuple(&#39;Pal&#39;, [&#39;name&#39;, &#39;age&#39;])</span>
+<span class="sd">            &gt;&gt;&gt; db = sqlitent(&#39;:memory:&#39;)</span>
+<span class="sd">            &gt;&gt;&gt; p = Pal(&#39;Jim&#39;, 35)</span>
+<span class="sd">            &gt;&gt;&gt; db.remove(p)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">tupletype</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">nt</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">tupletype</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tupletypes</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__register</span><span class="p">(</span><span class="n">tupletype</span><span class="p">,</span> <span class="p">{</span><span class="n">f</span><span class="p">:</span> <span class="nb">type</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">nt</span><span class="o">.</span><span class="n">_asdict</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">()})</span>
+        <span class="k">if</span> <span class="bp">None</span> <span class="ow">in</span> <span class="n">nt</span> <span class="ow">and</span> <span class="n">nt</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="k">return</span> <span class="c1"># abort if exists, because Sqlite&#39;s NULL isn&#39;t unique</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__execute</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__insert_stmt</span><span class="p">[</span><span class="n">tupletype</span><span class="p">],</span> <span class="n">nt</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-30'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-30'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">insert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">nts</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Insert one or more namedtuples to the database.</span>
+<span class="sd">            &gt;&gt;&gt; Pal = collections.namedtuple(&#39;Pal&#39;, [&#39;name&#39;, &#39;age&#39;])</span>
+<span class="sd">            &gt;&gt;&gt; db = sqlitent(&#39;:memory:&#39;)</span>
+<span class="sd">            &gt;&gt;&gt; p = Pal(&#39;Jim&#39;, 35)</span>
+<span class="sd">            &gt;&gt;&gt; db.remove(p)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">for</span> <span class="n">tup</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">_flatten</span><span class="p">(</span><span class="n">nts</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tup</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-31'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-31'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nt</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Remove one matching namedtuple from the database.</span>
+<span class="sd">            &gt;&gt;&gt; Pal = collections.namedtuple(&#39;Pal&#39;, [&#39;name&#39;, &#39;age&#39;])</span>
+<span class="sd">            &gt;&gt;&gt; db = sqlitent(&#39;:memory:&#39;)</span>
+<span class="sd">            &gt;&gt;&gt; p = Pal(&#39;Jim&#39;, 35)</span>
+<span class="sd">            &gt;&gt;&gt; db.remove(p)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">tupletype</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">nt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__assert_registered</span><span class="p">(</span><span class="n">tupletype</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__execute</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__delete_stmt</span><span class="p">[</span><span class="n">tupletype</span><span class="p">],</span> <span class="n">nt</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-32'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-32'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">nts</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Remove one or more namedtuples from the database.</span>
+<span class="sd">            &gt;&gt;&gt; Pal = collections.namedtuple(&#39;Pal&#39;, [&#39;name&#39;, &#39;age&#39;])</span>
+<span class="sd">            &gt;&gt;&gt; db = sqlitent(&#39;:memory:&#39;)</span>
+<span class="sd">            &gt;&gt;&gt; p = Pal(&#39;Jim&#39;, 35)</span>
+<span class="sd">            &gt;&gt;&gt; db.delete([p, p])</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">for</span> <span class="n">tup</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">_flatten</span><span class="p">(</span><span class="n">nts</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">tup</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-33'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-33'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">one</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tupletype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Return one matching namedtuple or None.</span>
+<span class="sd">            &gt;&gt;&gt; Pal = collections.namedtuple(&#39;Pal&#39;, [&#39;name&#39;, &#39;age&#39;])</span>
+<span class="sd">            &gt;&gt;&gt; db = sqlitent(&#39;:memory:&#39;)</span>
+<span class="sd">            &gt;&gt;&gt; p = Pal(&#39;Jim&#39;, 35)</span>
+<span class="sd">            &gt;&gt;&gt; db.one(Pal, name=&#39;Jim&#39;)</span>
+<span class="sd">            Pal(&#39;Jim&#39;, 35)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__assert_registered</span><span class="p">(</span><span class="n">tupletype</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">tup</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">many</span><span class="p">(</span><span class="n">tupletype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">tup</span>
+        <span class="k">return</span> <span class="bp">None</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
   <div class='section' id='section-34'>
     <div class='docs'>
       <div class='octowrap'>
@@ -563,8 +582,21 @@ tupletype. Hence tupletype is added to the recognized namedtuples.</p>
       
     </div>
     <div class='code'>
-      <div class="highlight"><pre>    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__execute</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__count_stmt</span><span class="p">[</span><span class="n">t</span><span class="p">])</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tupletypes</span><span class="p">)</span></pre></div>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">pop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tupletype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Return one matching namedtuple or None and remove the returned</span>
+<span class="sd">            namedtuple from the database.</span>
+<span class="sd">            &gt;&gt;&gt; Pal = collections.namedtuple(&#39;Pal&#39;, [&#39;name&#39;, &#39;age&#39;])</span>
+<span class="sd">            &gt;&gt;&gt; db = sqlitent(&#39;:memory:&#39;)</span>
+<span class="sd">            &gt;&gt;&gt; p = Pal(&#39;Jim&#39;, 35)</span>
+<span class="sd">            &gt;&gt;&gt; db.pop(Pal, name=&#39;Jim&#39;)</span>
+<span class="sd">            Pal(&#39;Jim&#39;, 35)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__assert_registered</span><span class="p">(</span><span class="n">tupletype</span><span class="p">)</span>
+        <span class="n">tup</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">one</span><span class="p">(</span><span class="n">tupletype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">tup</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">tup</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">tup</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div>
@@ -576,117 +608,14 @@ tupletype. Hence tupletype is added to the recognized namedtuples.</p>
       
     </div>
     <div class='code'>
-      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nt</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__assert_is_namedtuple</span><span class="p">(</span><span class="n">nt</span><span class="p">)</span>
-        <span class="n">tupletype</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">nt</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">tupletype</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tupletypes</span><span class="p">:</span>
-            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;========= NEW =========&#39;</span><span class="p">)</span>
-            <span class="k">print</span><span class="p">(</span><span class="n">tupletype</span><span class="p">)</span>
-            <span class="k">print</span><span class="p">(</span><span class="n">nt</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__register</span><span class="p">(</span><span class="n">tupletype</span><span class="p">,</span> <span class="o">**</span><span class="p">{</span><span class="n">f</span><span class="p">:</span> <span class="nb">type</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">nt</span><span class="o">.</span><span class="n">_asdict</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">()})</span>
-        <span class="k">if</span> <span class="bp">None</span> <span class="ow">in</span> <span class="n">nt</span> <span class="ow">and</span> <span class="n">nt</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span></pre></div>
-    </div>
-  </div>
-  <div class='clearall'></div>
-  <div class='section' id='section-36'>
-    <div class='docs'>
-      <div class='octowrap'>
-        <a class='octothorpe' href='#section-36'>#</a>
-      </div>
-      <p>abort if exists, because NULL doesn't violate uniqueness in Sqlite</p>
-    </div>
-    <div class='code'>
-      <div class="highlight"><pre>            <span class="k">return</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__execute</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__insert_stmt</span><span class="p">[</span><span class="n">tupletype</span><span class="p">],</span> <span class="n">nt</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span></pre></div>
-    </div>
-  </div>
-  <div class='clearall'></div>
-  <div class='section' id='section-37'>
-    <div class='docs'>
-      <div class='octowrap'>
-        <a class='octothorpe' href='#section-37'>#</a>
-      </div>
-      
-    </div>
-    <div class='code'>
-      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">insert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">nts</span><span class="p">):</span>
-        <span class="n">tmp</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__to_ntlist</span><span class="p">(</span><span class="n">nts</span><span class="p">))</span>
-        <span class="k">for</span> <span class="n">nt</span> <span class="ow">in</span> <span class="n">tmp</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">nt</span><span class="p">)</span></pre></div>
-    </div>
-  </div>
-  <div class='clearall'></div>
-  <div class='section' id='section-38'>
-    <div class='docs'>
-      <div class='octowrap'>
-        <a class='octothorpe' href='#section-38'>#</a>
-      </div>
-      
-    </div>
-    <div class='code'>
-      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nt</span><span class="p">):</span>
-        <span class="n">tupletype</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">nt</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">tupletype</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tupletypes</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;unknown tupletype: {tupletype}&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__execute</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__delete_stmt</span><span class="p">[</span><span class="n">tupletype</span><span class="p">],</span> <span class="n">nt</span><span class="p">)</span></pre></div>
-    </div>
-  </div>
-  <div class='clearall'></div>
-  <div class='section' id='section-39'>
-    <div class='docs'>
-      <div class='octowrap'>
-        <a class='octothorpe' href='#section-39'>#</a>
-      </div>
-      
-    </div>
-    <div class='code'>
-      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">nts</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">nt</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__to_ntlist</span><span class="p">(</span><span class="n">nts</span><span class="p">)):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">nt</span><span class="p">)</span></pre></div>
-    </div>
-  </div>
-  <div class='clearall'></div>
-  <div class='section' id='section-40'>
-    <div class='docs'>
-      <div class='octowrap'>
-        <a class='octothorpe' href='#section-40'>#</a>
-      </div>
-      
-    </div>
-    <div class='code'>
-      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">one</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nt_type</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">nt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">many</span><span class="p">(</span><span class="n">nt_type</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">nt</span>
-        <span class="k">return</span> <span class="bp">None</span></pre></div>
-    </div>
-  </div>
-  <div class='clearall'></div>
-  <div class='section' id='section-41'>
-    <div class='docs'>
-      <div class='octowrap'>
-        <a class='octothorpe' href='#section-41'>#</a>
-      </div>
-      
-    </div>
-    <div class='code'>
-      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">pop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nt_type</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">one</span><span class="p">(</span><span class="n">nt_type</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">tmp</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">tmp</span></pre></div>
-    </div>
-  </div>
-  <div class='clearall'></div>
-  <div class='section' id='section-42'>
-    <div class='docs'>
-      <div class='octowrap'>
-        <a class='octothorpe' href='#section-42'>#</a>
-      </div>
-      
-    </div>
-    <div class='code'>
       <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">many</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tupletype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Return zero or more matching namedtuples.</span>
+<span class="sd">            &gt;&gt;&gt; Pal = collections.namedtuple(&#39;Pal&#39;, [&#39;name&#39;, &#39;age&#39;])</span>
+<span class="sd">            &gt;&gt;&gt; db = sqlitent(&#39;:memory:&#39;)</span>
+<span class="sd">            &gt;&gt;&gt; db.many(Pal, name=&#39;Jim&#39;)</span>
+<span class="sd">            [...]</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">k</span> <span class="ow">in</span> <span class="n">tupletype</span><span class="o">.</span><span class="n">_fields</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{tupletype} doesn</span><span class="se">\&#39;</span><span class="s1">t have one of your keywords&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">tupletype</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tupletypes</span><span class="p">:</span>
@@ -714,18 +643,26 @@ tupletype. Hence tupletype is added to the recognized namedtuples.</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-43'>
+  <div class='section' id='section-36'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-43'>#</a>
+        <a class='octothorpe' href='#section-36'>#</a>
       </div>
       
     </div>
     <div class='code'>
-      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">popmany</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nt_type</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="n">tmp</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">many</span><span class="p">(</span><span class="n">nt_type</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">tmp</span>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">popmany</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tupletype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Return zero or more matching namedtuples and removes them</span>
+<span class="sd">            from the database.</span>
+<span class="sd">            &gt;&gt;&gt; Pal = collections.namedtuple(&#39;Pal&#39;, [&#39;name&#39;, &#39;age&#39;])</span>
+<span class="sd">            &gt;&gt;&gt; db = sqlitent(&#39;:memory:&#39;)</span>
+<span class="sd">            &gt;&gt;&gt; db.popmany(Pal, name=&#39;Jim&#39;)</span>
+<span class="sd">            [...]</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">tups</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">many</span><span class="p">(</span><span class="n">tupletype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">tups</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">tups</span>
 
 </pre></div>
     </div>
