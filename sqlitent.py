@@ -4,6 +4,21 @@ import pickle
 import itertools
 import types
 
+# Helpers
+
+def _sqlname(name):
+    # SQL is case insensitive. Append the hex encoded value for uniqueness.
+    return f'{name}_{name.encode("ascii").hex()}'
+
+def _sqltype(_type):
+    if int   == type: return 'INTEGER'
+    if float == type: return 'REAL'
+    if str   == type: return 'TEXT'
+    if bytes == type: return 'BLOB'
+    return ''
+
+
+# API
 
 class sqlitent(collections.abc.Collection):
 
@@ -23,20 +38,12 @@ class sqlitent(collections.abc.Collection):
                    hasattr(nt, '_source') and hasattr(nt, '_replace') and \
                    hasattr(nt, '_asdict')
 
-    def __sqlname(self, name):
-        # SQL is case insensitive. Append the hex encoded value for uniqueness.
-        unique = name.encode('ascii').hex()
-        return f'{name}_{unique}'
-
-    def __sqltype(self, nt_type):
-        if int   == nt_type: return 'INTEGER'
-        if float == nt_type: return 'REAL'
-        if str   == nt_type: return 'TEXT'
-        if bytes == nt_type: return 'BLOB'
-        return ''
+    def __assert_is_namedtuple(self, nt):
+        if not self.__isnamedtuple(nt):
+            raise Exception(f'expected namedtuple, instead got {type(nt)}: {nt}')
 
     def __tablename(self, nt):
-        return self.__sqlname(type(nt).__name__)
+        return _sqlname(type(nt).__name__)
 
     def __execute(self, stmt, *args, **kwargs):
         return self.__db.cursor().execute(stmt, *args, **kwargs)
@@ -44,11 +51,11 @@ class sqlitent(collections.abc.Collection):
     def __setuptable(self, nt):
         table = self.__tablename(nt)
         nt_type = type(nt)
-        fields = ','.join(self.__sqlname(field) for field in nt._fields)
+        fields = ','.join(_sqlname(field) for field in nt._fields)
 
         # build and run the create table statement
         stmt = ','.join(
-            f'{self.__sqlname(f)} {self.__sqltype(type(getattr(nt, f)))}'
+            f'{_sqlname(f)} {_sqltype(type(getattr(nt, f)))}'
             for f in nt._fields
         )
         stmt = f'CREATE TABLE IF NOT EXISTS {table} ({stmt}, UNIQUE ({fields}));'
@@ -64,7 +71,7 @@ class sqlitent(collections.abc.Collection):
         self.__select_cache[nt_type] = f'SELECT {fields} FROM {table};'
 
         # build and cache the select statement for a fully specified tuple
-        stmt = ' AND '.join(f'{self.__sqlname(f)} IS ?' for f in nt._fields)
+        stmt = ' AND '.join(f'{_sqlname(f)} IS ?' for f in nt._fields)
         stmt = f'SELECT {fields} FROM {table} WHERE {stmt};'
         self.__single_cache[nt_type] = stmt
 
@@ -72,7 +79,7 @@ class sqlitent(collections.abc.Collection):
         self.__count_cache[nt_type] = f'SELECT count(*) FROM {table};'
 
         # build and cache the delete statement for a fully specified tuple
-        stmt = ' AND '.join(f'{self.__sqlname(f)} IS ?' for f in nt._fields)
+        stmt = ' AND '.join(f'{_sqlname(f)} IS ?' for f in nt._fields)
         stmt = f'DELETE FROM {table} WHERE {stmt};'
         self.__delete_cache[nt_type] = stmt
 
@@ -94,8 +101,7 @@ class sqlitent(collections.abc.Collection):
             yield value
 
     def __contains__(self, nt):
-        if not self.__isnamedtuple(nt):
-            raise Exception(f'expected namedtuple, instead got {type(nt)}: {nt}')
+        self.__assert_is_namedtuple(nt)
         nt_type = type(nt)
         if nt_type not in self.__insert_cache:
             self.__setuptable(nt)
@@ -113,8 +119,7 @@ class sqlitent(collections.abc.Collection):
         )
 
     def add(self, nt):
-        if not self.__isnamedtuple(nt):
-            raise Exception(f'expected namedtuple, instead got {type(nt)}: {nt}')
+        self.__assert_is_namedtuple(nt)
         nt_type = type(nt)
         if nt_type not in self.__insert_cache:
             self.__setuptable(nt)
@@ -130,16 +135,14 @@ class sqlitent(collections.abc.Collection):
             self.add(nt)
 
     def remove(self, nt):
-        if not self.__isnamedtuple(nt):
-            raise Exception(f'expected namedtuple, instead got {type(nt)}: {nt}')
+        self.__assert_is_namedtuple(nt)
         nt_type = type(nt)
         if nt_type in self.__delete_cache:
             self.__execute(self.__delete_cache[nt_type], nt)
-            self.__db.commit()
+        self.__db.commit()
 
     def delete(self, *nts):
-        tmp = set(self.__to_ntlist(nts))
-        for nt in tmp:
+        for nt in set(self.__to_ntlist(nts)):
             self.remove(nt)
 
     def one(self, nt_type, **kwargs):
@@ -164,16 +167,14 @@ class sqlitent(collections.abc.Collection):
             if isinstance(value, types.FunctionType):
                 filters.append(lambda t: value(getattr(t, field)))
             else:
-                clauses.append(f'{self.__sqlname(field)} IS ?')
+                clauses.append(f'{_sqlname(field)} IS ?')
                 sqlparams.append(value)
 
-        table = self.__sqlname(nt_type.__name__)
+        table = _sqlname(nt_type.__name__)
         stmt = f'SELECT * FROM {table}' + (' WHERE ' + ' AND '.join(clauses) if clauses else '') + ';'
 
         it = self.__execute(stmt, sqlparams)
-        print(it)
         it = map(nt_type._make, it)
-        print(it)
         for fn in filters:
             it = filter(fn, it)
             print(fn, it)
