@@ -1,10 +1,13 @@
 import collections.abc
+import collections
 import sqlite3
 import pickle
 import itertools
 import types
 
+################################################################################
 # Helpers
+################################################################################
 
 def _sqlname(name):
     ''' Appends a hex-encoded version of the name to itself to distinguish
@@ -16,6 +19,7 @@ def _sqlname(name):
         'aaa_616161'
     '''
     return f'{name}_{name.encode("ascii").hex()}'
+
 
 def _sqltype(_type):
     ''' Returns the corresponding Sqlite datatype given a Python type.
@@ -32,7 +36,17 @@ def _sqltype(_type):
     return 'BLOB'
 
 
-# API
+def _identity(something):
+    return something
+
+
+def _istrivial(val):
+    return val in (type(None), int, float, str, bytes)
+
+
+################################################################################
+# sqlitent API
+################################################################################
 
 class sqlitent(collections.abc.Collection):
 
@@ -45,6 +59,18 @@ class sqlitent(collections.abc.Collection):
         self.__delete_cache = {}
         self.__encode = encode
         self.__decode = decode
+        self.__tup = set()
+
+    def register(self, tupletype, **fields):
+        fields = collections.OrderedDict([(f, fields[f]) for f in tupletype._fields])
+        self.__tuples.add(tupletype)
+        self.__encoder[tupletype] = [_identity if _istrivial(t) else self.__encode for t in fields.values()]
+        self.__decoder[tupletype] = [_identity if _istrivial(t) else self.__decode for t in fields.values()]
+        self.__insert_stmt[tupletype] = _build_insert_stmt(name, fieldtypes.keys())
+        self.__select_stmt[tupletype] = _build_select_stmt(name, fieldtypes.keys())
+        self.__count_stmt[tupletype] = _build_count_stmt(name)
+        self.__execute(self._build_create_table_stmt(name, fieldtypes))
+
 
     def __isnamedtuple(self, nt):
         return isinstance(nt, tuple) and hasattr(nt, '_fields') and \
