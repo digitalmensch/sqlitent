@@ -13,7 +13,7 @@ setup(
     keywords='sqlite, persistent set, namedtuple',
     platforms='any',
     license="MIT",
-    version='0.1',
+    version='0.2',
     author='Tobias Ammann',
     py_modules=['sqlitent'],
     classifiers=[
