@@ -22,7 +22,6 @@ def point():
 def nonempty(empty, point):
     for _ in range(25):
         p = point(random(), random(), random())
-        print(p)
         assert empty.add(p) == None
 
     return empty
