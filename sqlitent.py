@@ -7,15 +7,29 @@ import types
 # Helpers
 
 def _sqlname(name):
-    # SQL is case insensitive. Append the hex encoded value for uniqueness.
+    ''' Appends a hex-encoded version of the name to itself to distinguish
+        between lower and upper case.
+
+        >>> _sqlname('AAA')
+        'AAA_414141'
+        >>> _sqlname('aaa')
+        'aaa_616161'
+    '''
     return f'{name}_{name.encode("ascii").hex()}'
 
 def _sqltype(_type):
-    if int   == type: return 'INTEGER'
-    if float == type: return 'REAL'
-    if str   == type: return 'TEXT'
-    if bytes == type: return 'BLOB'
-    return ''
+    ''' Returns the corresponding Sqlite datatype given a Python type.
+
+        >>> _sqltype(int)
+        'INTEGER'
+        >>> _sqltype(object)
+        'BLOB'
+    '''
+    if int   == _type: return 'INTEGER'
+    if float == _type: return 'REAL'
+    if str   == _type: return 'TEXT'
+    if bytes == _type: return 'BLOB'
+    return 'BLOB'
 
 
 # API
