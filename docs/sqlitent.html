@@ -170,7 +170,9 @@
     </div>
     <div class='code'>
       <div class="highlight"><pre>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">database</span><span class="p">,</span> <span class="n">encode</span><span class="o">=</span><span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">,</span> <span class="n">decode</span><span class="o">=</span><span class="n">pickle</span><span class="o">.</span><span class="n">loads</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__db</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">database</span><span class="p">)</span></pre></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__db</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">database</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__encode</span> <span class="o">=</span> <span class="n">encode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__decode</span> <span class="o">=</span> <span class="n">decode</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div>
@@ -424,10 +426,11 @@ tupletype. Hence tupletype is added to the recognized namedtuples.</p>
       
     </div>
     <div class='code'>
-      <div class="highlight"><pre>    <span class="k">def</span> <span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nt</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">nt</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tupletypes</span><span class="p">:</span>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tup</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">tup</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tupletypes</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">False</span>
-        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__execute</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__select_stmt</span><span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="n">nt</span><span class="p">)],</span> <span class="n">nt</span><span class="p">)))</span></pre></div>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__encoder</span><span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="n">tup</span><span class="p">)](</span><span class="n">tup</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__execute</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__select_stmt</span><span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="n">tup</span><span class="p">)],</span> <span class="n">tmp</span><span class="p">)))</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div>
@@ -482,7 +485,8 @@ tupletype. Hence tupletype is added to the recognized namedtuples.</p>
             <span class="bp">self</span><span class="o">.</span><span class="n">__register</span><span class="p">(</span><span class="n">tupletype</span><span class="p">,</span> <span class="p">{</span><span class="n">f</span><span class="p">:</span> <span class="nb">type</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">nt</span><span class="o">.</span><span class="n">_asdict</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">()})</span>
         <span class="k">if</span> <span class="bp">None</span> <span class="ow">in</span> <span class="n">nt</span> <span class="ow">and</span> <span class="n">nt</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
             <span class="k">return</span> <span class="c1"># abort if exists, because Sqlite&#39;s NULL isn&#39;t unique</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__execute</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__insert_stmt</span><span class="p">[</span><span class="n">tupletype</span><span class="p">],</span> <span class="n">nt</span><span class="p">)</span></pre></div>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__encoder</span><span class="p">[</span><span class="n">tupletype</span><span class="p">](</span><span class="n">nt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__execute</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__insert_stmt</span><span class="p">[</span><span class="n">tupletype</span><span class="p">],</span> <span class="n">tmp</span><span class="p">)</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div>
@@ -515,7 +519,7 @@ tupletype. Hence tupletype is added to the recognized namedtuples.</p>
       
     </div>
     <div class='code'>
-      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nt</span><span class="p">):</span>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tup</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Remove one matching namedtuple from the database.</span>
 <span class="sd">            &gt;&gt;&gt; Pal = collections.namedtuple(&#39;Pal&#39;, [&#39;name&#39;, &#39;age&#39;])</span>
 <span class="sd">            &gt;&gt;&gt; db = sqlitent(&#39;:memory:&#39;)</span>
@@ -523,9 +527,10 @@ tupletype. Hence tupletype is added to the recognized namedtuples.</p>
 <span class="sd">            &gt;&gt;&gt; db.remove(p)</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
-        <span class="n">tupletype</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">nt</span><span class="p">)</span>
+        <span class="n">tupletype</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">tup</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__assert_registered</span><span class="p">(</span><span class="n">tupletype</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__execute</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__delete_stmt</span><span class="p">[</span><span class="n">tupletype</span><span class="p">],</span> <span class="n">nt</span><span class="p">)</span></pre></div>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__encoder</span><span class="p">[</span><span class="n">tupletype</span><span class="p">](</span><span class="n">tup</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__execute</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__delete_stmt</span><span class="p">[</span><span class="n">tupletype</span><span class="p">],</span> <span class="n">tmp</span><span class="p">)</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div>

@@ -1,6 +1,7 @@
 import pytest
 import sqlitent
 import collections
+import datetime
 from random import random
 
 
@@ -16,6 +17,11 @@ def empty():
 @pytest.fixture
 def point():
     return collections.namedtuple('point', ['x', 'y', 'z'])
+
+
+@pytest.fixture
+def timestamp():
+    return collections.namedtuple('timestamp', ['dt'])
 
 
 @pytest.fixture
@@ -88,3 +94,24 @@ def test_insert(empty, point):
 def test_delete(nonempty):
     assert nonempty.delete(list(nonempty)) == None
     assert len(nonempty) == 0
+
+
+################################################################################
+# # Testing operations on complex types
+################################################################################
+
+def test_add_datetime(empty, timestamp):
+    ts = timestamp(datetime.datetime.now())
+    assert empty.add(ts) == None
+    assert ts in empty
+
+
+def test_remove_datetime(nonempty, timestamp):
+    ts = timestamp(datetime.datetime.now())
+    assert nonempty.add(ts) == None
+    assert ts in nonempty
+    xx = nonempty.one(timestamp)
+    assert isinstance(xx, timestamp)
+    assert xx == ts
+    assert nonempty.remove(xx) == None
+    assert ts not in nonempty

@@ -23,6 +23,7 @@
       <div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pytest</span>
 <span class="kn">import</span> <span class="nn">sqlitent</span>
 <span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
 <span class="kn">from</span> <span class="nn">random</span> <span class="kn">import</span> <span class="n">random</span></pre></div>
     </div>
   </div>
@@ -57,6 +58,11 @@
 <span class="nd">@pytest.fixture</span>
 <span class="k">def</span> <span class="nf">point</span><span class="p">():</span>
     <span class="k">return</span> <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;point&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">])</span>
+
+
+<span class="nd">@pytest.fixture</span>
+<span class="k">def</span> <span class="nf">timestamp</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;timestamp&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">])</span>
 
 
 <span class="nd">@pytest.fixture</span>
@@ -202,7 +208,56 @@
     <div class='code'>
       <div class="highlight"><pre><span class="k">def</span> <span class="nf">test_delete</span><span class="p">(</span><span class="n">nonempty</span><span class="p">):</span>
     <span class="k">assert</span> <span class="n">nonempty</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">nonempty</span><span class="p">))</span> <span class="o">==</span> <span class="bp">None</span>
-    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">nonempty</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">nonempty</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-11'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-11'>#</a>
+      </div>
+      <h6></h6>
+<h1>Testing operations on complex types</h1>
+<h6></h6>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-12'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-12'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">test_add_datetime</span><span class="p">(</span><span class="n">empty</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">):</span>
+    <span class="n">ts</span> <span class="o">=</span> <span class="n">timestamp</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
+    <span class="k">assert</span> <span class="n">empty</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span> <span class="o">==</span> <span class="bp">None</span>
+    <span class="k">assert</span> <span class="n">ts</span> <span class="ow">in</span> <span class="n">empty</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-13'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-13'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">test_remove_datetime</span><span class="p">(</span><span class="n">nonempty</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">):</span>
+    <span class="n">ts</span> <span class="o">=</span> <span class="n">timestamp</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
+    <span class="k">assert</span> <span class="n">nonempty</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span> <span class="o">==</span> <span class="bp">None</span>
+    <span class="k">assert</span> <span class="n">ts</span> <span class="ow">in</span> <span class="n">nonempty</span>
+    <span class="n">xx</span> <span class="o">=</span> <span class="n">nonempty</span><span class="o">.</span><span class="n">one</span><span class="p">(</span><span class="n">timestamp</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">xx</span> <span class="o">==</span> <span class="n">ts</span>
+    <span class="k">assert</span> <span class="n">nonempty</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">xx</span><span class="p">)</span> <span class="o">==</span> <span class="bp">None</span>
+    <span class="k">assert</span> <span class="n">ts</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">nonempty</span>
 
 </pre></div>
     </div>

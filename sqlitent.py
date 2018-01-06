@@ -64,6 +64,8 @@ class sqlitent(collections.abc.Collection):
 
     def __init__(self, database, encode=pickle.dumps, decode=pickle.loads):
         self.__db = sqlite3.connect(database)
+        self.__encode = encode
+        self.__decode = decode
 
         # We need to keep track of recognized namedtuples and how to encode
         # and decode them.
@@ -150,10 +152,11 @@ class sqlitent(collections.abc.Collection):
         self.__db.commit()
         return cur
 
-    def __contains__(self, nt):
-        if type(nt) not in self.__tupletypes:
+    def __contains__(self, tup):
+        if type(tup) not in self.__tupletypes:
             return False
-        return bool(list(self.__execute(self.__select_stmt[type(nt)], nt)))
+        tmp = self.__encoder[type(tup)](tup)
+        return bool(list(self.__execute(self.__select_stmt[type(tup)], tmp)))
 
     def __iter__(self):
         return itertools.chain.from_iterable(
@@ -178,7 +181,8 @@ class sqlitent(collections.abc.Collection):
             self.__register(tupletype, {f: type(v) for f, v in nt._asdict().items()})
         if None in nt and nt in self:
             return # abort if exists, because Sqlite's NULL isn't unique
-        self.__execute(self.__insert_stmt[tupletype], nt)
+        tmp = self.__encoder[tupletype](nt)
+        self.__execute(self.__insert_stmt[tupletype], tmp)
 
     def insert(self, *nts):
         ''' Insert one or more namedtuples to the database.
@@ -191,7 +195,7 @@ class sqlitent(collections.abc.Collection):
         for tup in set(_flatten(nts)):
             self.add(tup)
 
-    def remove(self, nt):
+    def remove(self, tup):
         ''' Remove one matching namedtuple from the database.
             >>> Pal = collections.namedtuple('Pal', ['name', 'age'])
             >>> db = sqlitent(':memory:')
@@ -199,9 +203,10 @@ class sqlitent(collections.abc.Collection):
             >>> db.remove(p)
         '''
 
-        tupletype = type(nt)
+        tupletype = type(tup)
         self.__assert_registered(tupletype)
-        self.__execute(self.__delete_stmt[tupletype], nt)
+        tmp = self.__encoder[tupletype](tup)
+        self.__execute(self.__delete_stmt[tupletype], tmp)
 
     def delete(self, *nts):
         ''' Remove one or more namedtuples from the database.
