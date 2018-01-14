@@ -99,14 +99,6 @@ filter functions:
     >>> list(db.many(Car, brand='Kia'))
     []
 
-There is a locking facility that uses SQLite's transaction API:
-
-::
-
-    >>> with db.lock():
-    ...     p = db.pop(Point, x=11)
-    ...     db.add(p._replace(x=p.x+1))
-
 The code is MIT licensed.
 
 .. _Sqlite: https://sqlite.org/
