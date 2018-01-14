@@ -9,7 +9,7 @@ sqlitent was inspired by sqlitedict_ and kv_.
 Example
 -------
 
-::
+.. code:: python
 
     >>> from collections import namedtuple
     >>> from sqlitent import sqlitent, fuzzy
@@ -35,7 +35,7 @@ Example
 In addition to the methods which the set type provides, there are convenience
 methods (insert, delete) that handle multiple tuples at once.
 
-::
+.. code:: python
 
     >>> db.add(p1)
     >>> db.remove(p1)
@@ -47,7 +47,7 @@ methods (insert, delete) that handle multiple tuples at once.
 
 Of course, sqlitent also supports membership checking and counting:
 
-::
+.. code:: python
 
     >>> d = c._replace(configuration='1.6 TDI S tronic', hp=116)
     >>> d in db
@@ -62,7 +62,7 @@ Of course, sqlitent also supports membership checking and counting:
 
 There are various ways to retreive tuples from the database:
 
-::
+.. code:: python
 
     >>> p3 = db.one(Point)  # not deterministic
     >>> p3
@@ -83,7 +83,7 @@ Obviously there are also functions to retrieve or pop multiple values out
 of the database. sqlitent also supports fuzzy matching on text fields and
 filter functions:
 
-::
+.. code:: python
 
     >>> cs = db.many(Car)  # get all cars
     >>> cs
