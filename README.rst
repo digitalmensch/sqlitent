@@ -6,6 +6,10 @@ name (case sensitive!) and number of fields. Documentation_.
 
 sqlitent was inspired by sqlitedict_ and kv_.
 
+.. image:: https://snyk.io/test/github/digitalmensch/sqlitent/badge.svg?targetFile=requirements.txt
+   :target: https://snyk.io/test/github/digitalmensch/sqlitent?targetFile=requirements.txt
+   :alt: Known Vulnerabilities
+
 Example
 -------
 
