@@ -18,9 +18,6 @@ sqlitent was inspired by sqlitedict_ and kv_.
 .. image:: https://img.shields.io/pypi/pyversions/sqlitent.svg
    :target: https://pypi.python.org/pypi/sqlitent
 
-.. image:: https://img.shields.io/travis/digitalmensch/sqlitent.svg
-   :target: https://travis-ci.org/digitalmensch/sqlitent
-
 .. image:: https://img.shields.io/pypi/l/sqlitent.svg
    :target: https://github.com/digitalmensch/sqlitent/blob/master/LICENSE
 
